@@ -1,0 +1,428 @@
+import { useState, useEffect } from 'react';
+import {
+    Box,
+    Typography,
+    Button,
+    TextField,
+    Card,
+    CardContent,
+    Grid,
+    IconButton,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Alert,
+    useTheme,
+    Divider,
+} from '@mui/material';
+import {
+    Add as AddIcon,
+    Edit as EditIcon,
+    Delete as DeleteIcon,
+    Save as SaveIcon,
+    Cancel as CancelIcon,
+    AccountBalanceWallet as WalletIcon,
+} from '@mui/icons-material';
+import { useAuth } from '../services/authComponents';
+import chitfundAPI from '../services/chitfundService';
+
+function ChitFund() {
+    const theme = useTheme();
+    const [chitFunds, setChitFunds] = useState([]);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [editingItem, setEditingItem] = useState(null);
+    const [formData, setFormData] = useState({
+        year: '',
+        permanentAmount: '',
+        temporaryAmount: '',
+        juniorAmount: '',
+        villageContribution: '',
+        otherContributions: '',
+        grandTotal: '',
+        amountSpent: '',
+    });
+    const { isAuthorized } = useAuth();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        loadChitFunds();
+    }, []);
+
+    const loadChitFunds = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const data = await chitfundAPI.getAll();
+            setChitFunds(data);
+        } catch (err) {
+            setError('Failed to load chit fund data');
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleOpenDialog = () => {
+        setFormData({
+            year: new Date().getFullYear().toString(),
+            permanentAmount: '',
+            temporaryAmount: '',
+            juniorAmount: '',
+            villageContribution: '',
+            otherContributions: '',
+            grandTotal: '',
+            amountSpent: '',
+        });
+        setEditingItem(null);
+        setOpenDialog(true);
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+        setEditingItem(null);
+        setFormData({
+            year: '',
+            permanentAmount: '',
+            temporaryAmount: '',
+            juniorAmount: '',
+            villageContribution: '',
+            otherContributions: '',
+            grandTotal: '',
+            amountSpent: '',
+        });
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const calculateTotalReceived = (data) => {
+        return (parseFloat(data.permanentAmount) || 0) +
+            (parseFloat(data.temporaryAmount) || 0) +
+            (parseFloat(data.juniorAmount) || 0) +
+            (parseFloat(data.villageContribution) || 0) +
+            (parseFloat(data.otherContributions) || 0);
+    };
+
+    const calculateBalance = (data) => {
+        const received = calculateTotalReceived(data);
+        const spent = parseFloat(data.amountSpent) || 0;
+        return received - spent;
+    };
+
+    const handleSave = async () => {
+        try {
+            const currentBalance = (
+                (parseFloat(formData.permanentAmount) || 0) +
+                (parseFloat(formData.temporaryAmount) || 0) +
+                (parseFloat(formData.juniorAmount) || 0) +
+                (parseFloat(formData.villageContribution) || 0) +
+                (parseFloat(formData.otherContributions) || 0)
+            ) - (parseFloat(formData.amountSpent) || 0);
+
+            const inputGrandTotal = parseFloat(formData.grandTotal) || 0;
+            const finalGrandTotal = inputGrandTotal + currentBalance;
+
+            const chitfundData = {
+                year: formData.year,
+                permanentAmount: parseFloat(formData.permanentAmount) || 0,
+                temporaryAmount: parseFloat(formData.temporaryAmount) || 0,
+                juniorAmount: parseFloat(formData.juniorAmount) || 0,
+                villageContribution: parseFloat(formData.villageContribution) || 0,
+                otherContributions: parseFloat(formData.otherContributions) || 0,
+                inputGrandTotal: inputGrandTotal,
+                grandTotal: finalGrandTotal,
+                amountSpent: parseFloat(formData.amountSpent) || 0,
+            };
+
+            if (editingItem) {
+                await chitfundAPI.update(editingItem.id, chitfundData);
+            } else {
+                await chitfundAPI.create(chitfundData);
+            }
+
+            await loadChitFunds();
+            handleCloseDialog();
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleEdit = (item) => {
+        setEditingItem(item);
+        setFormData({
+            year: item.year,
+            permanentAmount: item.permanentAmount.toString(),
+            temporaryAmount: item.temporaryAmount.toString(),
+            juniorAmount: item.juniorAmount.toString(),
+            villageContribution: item.villageContribution.toString(),
+            otherContributions: item.otherContributions ? item.otherContributions.toString() : '0',
+            grandTotal: item.inputGrandTotal ? item.inputGrandTotal.toString() : '',
+            amountSpent: item.amountSpent.toString(),
+        });
+        setOpenDialog(true);
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            await chitfundAPI.delete(id);
+            await loadChitFunds();
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    return (
+        <Box sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
+                    HT VINAYAKA CHIT FUND
+                </Typography>
+                {isAuthorized && (
+                    <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={handleOpenDialog}
+                        sx={{
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            '&:hover': {
+                                background: 'linear-gradient(135deg, #5568d3 0%, #63408a 100%)',
+                            },
+                        }}
+                    >
+                        Add Details
+                    </Button>
+                )}
+            </Box>
+
+            {!isAuthorized && (
+                <Alert severity="info" sx={{ mb: 3 }}>
+                    You don't have permission to add, edit, or delete chit fund details. Only authorized users can perform these actions.
+                </Alert>
+            )}
+
+            <Grid container spacing={3}>
+                {chitFunds
+                    .sort((a, b) => b.year - a.year) // Sort by year descending
+                    .map((item) => {
+                        const totalReceived = calculateTotalReceived(item);
+                        const balance = calculateBalance(item);
+
+                        return (
+                            <Grid item xs={12} sm={6} md={4} key={item.id}>
+                                <Card
+                                    sx={{
+                                        minHeight: 300,
+                                        borderRadius: 3,
+                                        position: 'relative',
+                                        boxShadow: theme.palette.mode === 'dark'
+                                            ? '0 4px 12px rgba(0,0,0,0.3)'
+                                            : '0 4px 12px rgba(0,0,0,0.1)',
+                                        transition: 'transform 0.2s',
+                                        '&:hover': {
+                                            transform: 'translateY(-4px)',
+                                        },
+                                    }}
+                                >
+                                    <CardContent>
+                                        {isAuthorized && (
+                                            <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => handleEdit(item)}
+                                                    sx={{ color: theme.palette.primary.main }}
+                                                >
+                                                    <EditIcon fontSize="small" />
+                                                </IconButton>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => handleDelete(item.id)}
+                                                    sx={{ color: theme.palette.error.main }}
+                                                >
+                                                    <DeleteIcon fontSize="small" />
+                                                </IconButton>
+                                            </Box>
+                                        )}
+
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                            <WalletIcon sx={{ fontSize: 32, color: theme.palette.primary.main, mr: 1 }} />
+                                            <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                                                Year: {item.year}
+                                            </Typography>
+                                        </Box>
+
+                                        <Divider sx={{ mb: 2 }} />
+
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={12} sm={6}>
+                                                <Typography variant="body2" color="text.secondary">Permanent Membership</Typography>
+                                                <Typography variant="subtitle1" fontWeight="600">₹{item.permanentAmount.toLocaleString()}</Typography>
+                                            </Grid>
+                                            <Grid item xs={12} sm={6}>
+                                                <Typography variant="body2" color="text.secondary">Temporary Membership</Typography>
+                                                <Typography variant="subtitle1" fontWeight="600">₹{item.temporaryAmount.toLocaleString()}</Typography>
+                                            </Grid>
+                                            <Grid item xs={12} sm={6}>
+                                                <Typography variant="body2" color="text.secondary">Junior Membership</Typography>
+                                                <Typography variant="subtitle1" fontWeight="600">₹{item.juniorAmount.toLocaleString()}</Typography>
+                                            </Grid>
+                                            <Grid item xs={12} sm={6}>
+                                                <Typography variant="body2" color="text.secondary">Village Contribution</Typography>
+                                                <Typography variant="subtitle1" fontWeight="600">₹{item.villageContribution.toLocaleString()}</Typography>
+                                            </Grid>
+                                            <Grid item xs={12} sm={6}>
+                                                <Typography variant="body2" color="text.secondary">Other Contributions</Typography>
+                                                <Typography variant="subtitle1" fontWeight="600">₹{(item.otherContributions || 0).toLocaleString()}</Typography>
+                                            </Grid>
+                                        </Grid>
+
+                                        <Box sx={{ mt: 3, p: 2, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', borderRadius: 2 }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                                <Typography variant="body2">Total Received:</Typography>
+                                                <Typography variant="subtitle2" color="success.main" fontWeight="700">₹{totalReceived.toLocaleString()}</Typography>
+                                            </Box>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                                <Typography variant="body2">Total Spent:</Typography>
+                                                <Typography variant="subtitle2" color="error.main" fontWeight="700">₹{item.amountSpent.toLocaleString()}</Typography>
+                                            </Box>
+                                            <Divider sx={{ my: 1 }} />
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                                <Typography variant="subtitle1" fontWeight="700">Total Chit Fund Amount:</Typography>
+                                                <Typography variant="h6" color="primary.main" fontWeight="700">₹{balance.toLocaleString()}</Typography>
+                                            </Box>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <Typography variant="subtitle1" fontWeight="700">Grand Total:</Typography>
+                                                <Typography variant="h6" color="secondary.main" fontWeight="700">₹{(item.grandTotal || 0).toLocaleString()}</Typography>
+                                            </Box>
+                                        </Box>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        );
+                    })}
+
+                {chitFunds.length === 0 && (
+                    <Grid item xs={12}>
+                        <Box sx={{ textAlign: 'center', py: 8 }}>
+                            <Typography variant="h6" color="text.secondary">
+                                No chit fund details added yet
+                            </Typography>
+                        </Box>
+                    </Grid>
+                )}
+            </Grid>
+
+            <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+                <DialogTitle>
+                    {editingItem ? 'Edit Details' : 'Add Details'}
+                </DialogTitle>
+                <DialogContent>
+                    <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <TextField
+                            fullWidth
+                            label="Year"
+                            name="year"
+                            type="number"
+                            value={formData.year}
+                            onChange={handleInputChange}
+                            required
+                        />
+                        <TextField
+                            fullWidth
+                            label="Permanent Membership Amount"
+                            name="permanentAmount"
+                            type="number"
+                            value={formData.permanentAmount}
+                            onChange={handleInputChange}
+                            required
+                            InputProps={{ startAdornment: <Typography sx={{ mr: 1 }}>₹</Typography> }}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Temporary Membership Amount"
+                            name="temporaryAmount"
+                            type="number"
+                            value={formData.temporaryAmount}
+                            onChange={handleInputChange}
+                            required
+                            InputProps={{ startAdornment: <Typography sx={{ mr: 1 }}>₹</Typography> }}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Junior Membership Amount"
+                            name="juniorAmount"
+                            type="number"
+                            value={formData.juniorAmount}
+                            onChange={handleInputChange}
+                            required
+                            InputProps={{ startAdornment: <Typography sx={{ mr: 1 }}>₹</Typography> }}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Village Contribution Amount"
+                            name="villageContribution"
+                            type="number"
+                            value={formData.villageContribution}
+                            onChange={handleInputChange}
+                            required
+                            InputProps={{ startAdornment: <Typography sx={{ mr: 1 }}>₹</Typography> }}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Other Contributions"
+                            name="otherContributions"
+                            type="number"
+                            value={formData.otherContributions}
+                            onChange={handleInputChange}
+                            InputProps={{ startAdornment: <Typography sx={{ mr: 1 }}>₹</Typography> }}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Grand Total (Starting Balance)"
+                            name="grandTotal"
+                            type="number"
+                            value={formData.grandTotal}
+                            onChange={handleInputChange}
+                            InputProps={{ startAdornment: <Typography sx={{ mr: 1 }}>₹</Typography> }}
+                            helperText="This amount will be added to the current year's chit fund balance"
+                        />
+                        <TextField
+                            fullWidth
+                            label="Total Amount Spent This Year"
+                            name="amountSpent"
+                            type="number"
+                            value={formData.amountSpent}
+                            onChange={handleInputChange}
+                            required
+                            InputProps={{ startAdornment: <Typography sx={{ mr: 1 }}>₹</Typography> }}
+                        />
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button onClick={handleCloseDialog} startIcon={<CancelIcon />}>
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleSave}
+                        variant="contained"
+                        startIcon={<SaveIcon />}
+                        disabled={!formData.year}
+                        sx={{
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        }}
+                    >
+                        Save
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Box>
+    );
+}
+
+export default ChitFund;
