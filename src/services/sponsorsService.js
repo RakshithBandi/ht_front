@@ -1,8 +1,9 @@
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_URL = `${API_BASE_URL}/api`;
 
 const sponsorsAPI = {
     getAll: async () => {
-        const response = await fetch(`${API_BASE_URL}/sponsors/`, {
+        const response = await fetch(`${API_URL}/sponsors/`, {
             credentials: 'include'
         });
         if (!response.ok) throw new Error('Failed to fetch sponsors');
@@ -10,7 +11,7 @@ const sponsorsAPI = {
     },
 
     create: async (sponsorData) => {
-        const response = await fetch(`${API_BASE_URL}/sponsors/`, {
+        const response = await fetch(`${API_URL}/sponsors/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -24,7 +25,7 @@ const sponsorsAPI = {
     },
 
     update: async (id, sponsorData) => {
-        const response = await fetch(`${API_BASE_URL}/sponsors/${id}/`, {
+        const response = await fetch(`${API_URL}/sponsors/${id}/`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -38,7 +39,7 @@ const sponsorsAPI = {
     },
 
     delete: async (id) => {
-        const response = await fetch(`${API_BASE_URL}/sponsors/${id}/`, {
+        const response = await fetch(`${API_URL}/sponsors/${id}/`, {
             method: 'DELETE',
             credentials: 'include'
         });
