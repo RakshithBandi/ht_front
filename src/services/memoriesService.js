@@ -1,49 +1,24 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-const API_URL = `${API_BASE_URL}/api`;
+import api from './api';
 
 const memoriesAPI = {
     getAll: async () => {
-        const response = await fetch(`${API_URL}/memories/`, {
-            credentials: 'include'
-        });
-        if (!response.ok) throw new Error('Failed to fetch memories');
-        return response.json();
+        const response = await api.get('/api/memories/');
+        return response.data;
     },
 
     create: async (memoryData) => {
-        const response = await fetch(`${API_URL}/memories/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(memoryData)
-        });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to create memory: ${response.status} ${response.statusText} - ${errorText}`);
-        }
-        return response.json();
+        const response = await api.post('/api/memories/', memoryData);
+        return response.data;
     },
 
     update: async (id, memoryData) => {
-        const response = await fetch(`${API_URL}/memories/${id}/`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(memoryData)
-        });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to update memory: ${response.status} ${response.statusText} - ${errorText}`);
-        }
-        return response.json();
+        const response = await api.put(`/api/memories/${id}/`, memoryData);
+        return response.data;
     },
 
     delete: async (id) => {
-        const response = await fetch(`${API_URL}/memories/${id}/`, {
-            method: 'DELETE',
-            credentials: 'include'
-        });
-        if (!response.ok) throw new Error('Failed to delete memory');
+        const response = await api.delete(`/api/memories/${id}/`);
+        return response.data;
     }
 };
 

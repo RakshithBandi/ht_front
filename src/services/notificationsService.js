@@ -1,63 +1,28 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-const API_URL = `${API_BASE_URL}/api/notifications`;
+import api from './api';
 
 const notificationsAPI = {
     getAll: async () => {
-        const response = await fetch(`${API_URL}/`, {
-            credentials: 'include'
-        });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to fetch notifications: ${response.status} ${response.statusText} - ${errorText}`);
-        }
-        return response.json();
+        const response = await api.get('/api/notifications/');
+        return response.data;
     },
 
     markAsRead: async (id) => {
-        const response = await fetch(`${API_URL}/${id}/mark_read/`, {
-            method: 'POST',
-            credentials: 'include'
-        });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to mark notification as read: ${response.status} ${response.statusText} - ${errorText}`);
-        }
-        return response.json();
+        const response = await api.post(`/api/notifications/${id}/mark_read/`);
+        return response.data;
     },
 
     markAllAsRead: async () => {
-        const response = await fetch(`${API_URL}/mark_all_read/`, {
-            method: 'POST',
-            credentials: 'include'
-        });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to mark all as read: ${response.status} ${response.statusText} - ${errorText}`);
-        }
-        return response.json();
+        const response = await api.post('/api/notifications/mark_all_read/');
+        return response.data;
     },
 
     delete: async (id) => {
-        const response = await fetch(`${API_URL}/${id}/`, {
-            method: 'DELETE',
-            credentials: 'include'
-        });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to delete notification: ${response.status} ${response.statusText} - ${errorText}`);
-        }
+        await api.delete(`/api/notifications/${id}/`);
     },
 
     clearAll: async () => {
-        const response = await fetch(`${API_URL}/clear_all/`, {
-            method: 'DELETE',
-            credentials: 'include'
-        });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to clear all notifications: ${response.status} ${response.statusText} - ${errorText}`);
-        }
-        return response.json();
+        const response = await api.delete('/api/notifications/clear_all/');
+        return response.data;
     }
 };
 

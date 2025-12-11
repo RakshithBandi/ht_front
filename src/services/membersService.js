@@ -1,133 +1,60 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-const API_URL = `${API_BASE_URL}/api`;
+import api from './api';
 
 const membersAPI = {
     permanent: {
         getAll: async () => {
-            const response = await fetch(`${API_URL}/members/permanent/`, {
-                credentials: 'include'
-            });
-            if (!response.ok) throw new Error('Failed to fetch permanent members');
-            return response.json();
+            const response = await api.get('/api/members/permanent/');
+            return response.data;
         },
         create: async (memberData) => {
-            const response = await fetch(`${API_URL}/members/permanent/`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(memberData)
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Failed to create permanent member: ${response.status} ${response.statusText} - ${errorText}`);
-            }
-            return response.json();
+            const response = await api.post('/api/members/permanent/', memberData);
+            return response.data;
         },
         update: async (id, memberData) => {
-            const response = await fetch(`${API_URL}/members/permanent/${id}/`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(memberData)
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Failed to update permanent member: ${response.status} ${response.statusText} - ${errorText}`);
-            }
-            return response.json();
+            const response = await api.put(`/api/members/permanent/${id}/`, memberData);
+            return response.data;
         },
         delete: async (id) => {
-            const response = await fetch(`${API_URL}/members/permanent/${id}/`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-            if (!response.ok) throw new Error('Failed to delete permanent member');
+            const response = await api.delete(`/api/members/permanent/${id}/`);
+            return response.data;
         }
     },
 
     temporary: {
         getAll: async () => {
-            const response = await fetch(`${API_URL}/members/temporary/`, {
-                credentials: 'include'
-            });
-            if (!response.ok) throw new Error('Failed to fetch temporary members');
-            return response.json();
+            const response = await api.get('/api/members/temporary/');
+            return response.data;
         },
         create: async (memberData) => {
-            const response = await fetch(`${API_URL}/members/temporary/`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(memberData)
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Failed to create temporary member: ${response.status} ${response.statusText} - ${errorText}`);
-            }
-            return response.json();
+            const response = await api.post('/api/members/temporary/', memberData);
+            return response.data;
         },
         update: async (id, memberData) => {
-            const response = await fetch(`${API_URL}/members/temporary/${id}/`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(memberData)
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Failed to update temporary member: ${response.status} ${response.statusText} - ${errorText}`);
-            }
-            return response.json();
+            const response = await api.put(`/api/members/temporary/${id}/`, memberData);
+            return response.data;
         },
         delete: async (id) => {
-            const response = await fetch(`${API_URL}/members/temporary/${id}/`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-            if (!response.ok) throw new Error('Failed to delete temporary member');
+            const response = await api.delete(`/api/members/temporary/${id}/`);
+            return response.data;
         }
     },
 
     junior: {
         getAll: async () => {
-            const response = await fetch(`${API_URL}/members/junior/`, {
-                credentials: 'include'
-            });
-            if (!response.ok) throw new Error('Failed to fetch junior members');
-            return response.json();
+            const response = await api.get('/api/members/junior/');
+            return response.data;
         },
         create: async (memberData) => {
-            const response = await fetch(`${API_URL}/members/junior/`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(memberData)
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Failed to create junior member: ${response.status} ${response.statusText} - ${errorText}`);
-            }
-            return response.json();
+            const response = await api.post('/api/members/junior/', memberData);
+            return response.data;
         },
         update: async (id, memberData) => {
-            const response = await fetch(`${API_URL}/members/junior/${id}/`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(memberData)
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Failed to update junior member: ${response.status} ${response.statusText} - ${errorText}`);
-            }
-            return response.json();
+            const response = await api.put(`/api/members/junior/${id}/`, memberData);
+            return response.data;
         },
         delete: async (id) => {
-            const response = await fetch(`${API_URL}/members/junior/${id}/`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-            if (!response.ok) throw new Error('Failed to delete junior member');
+            const response = await api.delete(`/api/members/junior/${id}/`);
+            return response.data;
         }
     }
 };

@@ -1,30 +1,14 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-const API_URL = `${API_BASE_URL}/api/profile`;
+import api from './api';
 
 const profileAPI = {
     getProfile: async () => {
-        const response = await fetch(`${API_URL}/me/`, {
-            credentials: 'include'
-        });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to fetch profile: ${response.status} ${response.statusText} - ${errorText}`);
-        }
-        return response.json();
+        const response = await api.get('/api/profile/me/');
+        return response.data;
     },
 
     updateProfile: async (profileData) => {
-        const response = await fetch(`${API_URL}/me/`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(profileData)
-        });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to update profile: ${response.status} ${response.statusText} - ${errorText}`);
-        }
-        return response.json();
+        const response = await api.put('/api/profile/me/', profileData);
+        return response.data;
     }
 };
 

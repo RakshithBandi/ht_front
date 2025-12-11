@@ -25,6 +25,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../services/authComponents';
+import api from '../services/api';
 
 function LoginPage() {
     const navigate = useNavigate();
@@ -52,22 +53,18 @@ function LoginPage() {
         setLoading(true);
 
         try {
-            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://compassionate-bravery-production-c3bf.up.railway.app';
-            console.log("Using API Base URL:", API_BASE_URL);
-            const response = await fetch(`${API_BASE_URL}/api/login/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    username: formData.email, // Assuming email is used as username or backend handles it
-                    password: formData.password
-                }),
+            console.log("Using API Base URL:", import.meta.env.VITE_API_BASE_URL);
+
+            // Use centralized API client for login
+            // This ensures cookies are handled correctly with credentials: true
+            const response = await api.post('/api/login/', {
+                username: formData.email,
+                password: formData.password
             });
 
-            const data = await response.json();
+            const data = response.data;
 
-            if (response.ok) {
+            if (response.status === 200) {
                 // Login successful
                 const sessionUser = {
                     fullName: data.username, // Backend returns username

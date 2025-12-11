@@ -1,49 +1,24 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-const API_URL = `${API_BASE_URL}/api`;
+import api from './api';
 
 const sponsorsAPI = {
     getAll: async () => {
-        const response = await fetch(`${API_URL}/sponsors/`, {
-            credentials: 'include'
-        });
-        if (!response.ok) throw new Error('Failed to fetch sponsors');
-        return response.json();
+        const response = await api.get('/api/sponsors/');
+        return response.data;
     },
 
     create: async (sponsorData) => {
-        const response = await fetch(`${API_URL}/sponsors/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(sponsorData)
-        });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to create sponsor: ${response.status} ${response.statusText} - ${errorText}`);
-        }
-        return response.json();
+        const response = await api.post('/api/sponsors/', sponsorData);
+        return response.data;
     },
 
     update: async (id, sponsorData) => {
-        const response = await fetch(`${API_URL}/sponsors/${id}/`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(sponsorData)
-        });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to update sponsor: ${response.status} ${response.statusText} - ${errorText}`);
-        }
-        return response.json();
+        const response = await api.put(`/api/sponsors/${id}/`, sponsorData);
+        return response.data;
     },
 
     delete: async (id) => {
-        const response = await fetch(`${API_URL}/sponsors/${id}/`, {
-            method: 'DELETE',
-            credentials: 'include'
-        });
-        if (!response.ok) throw new Error('Failed to delete sponsor');
+        const response = await api.delete(`/api/sponsors/${id}/`);
+        return response.data;
     }
 };
 
