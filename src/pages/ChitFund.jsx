@@ -179,9 +179,9 @@ function ChitFund() {
     };
 
     return (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1600, mx: 'auto' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-                <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
+                <Typography variant="h4" sx={{ fontWeight: 800 }}>
                     HT VINAYAKA CHIT FUND
                 </Typography>
                 {isAuthorized && (
@@ -190,9 +190,15 @@ function ChitFund() {
                         startIcon={<AddIcon />}
                         onClick={handleOpenDialog}
                         sx={{
+                            borderRadius: 2,
+                            px: 3,
+                            py: 1,
                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            boxShadow: '0 4px 14px 0 rgba(118, 75, 162, 0.3)',
                             '&:hover': {
                                 background: 'linear-gradient(135deg, #5568d3 0%, #63408a 100%)',
+                                transform: 'translateY(-1px)',
+                                boxShadow: '0 6px 20px 0 rgba(118, 75, 162, 0.4)',
                             },
                         }}
                     >
@@ -202,12 +208,21 @@ function ChitFund() {
             </Box>
 
             {!isAuthorized && (
-                <Alert severity="info" sx={{ mb: 3 }}>
+                <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
                     You don't have permission to add, edit, or delete chit fund details. Only authorized users can perform these actions.
                 </Alert>
             )}
 
-            <Grid container spacing={3}>
+            <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+                gap: 3,
+                animation: 'fadeIn 0.5s ease-in-out',
+                '@keyframes fadeIn': {
+                    '0%': { opacity: 0, transform: 'translateY(20px)' },
+                    '100%': { opacity: 1, transform: 'translateY(0)' },
+                }
+            }}>
                 {chitFunds
                     .sort((a, b) => b.year - a.year) // Sort by year descending
                     .map((item) => {
@@ -215,108 +230,160 @@ function ChitFund() {
                         const balance = calculateBalance(item);
 
                         return (
-                            <Grid item xs={12} sm={6} md={4} key={item.id}>
-                                <Card
-                                    sx={{
-                                        minHeight: 300,
-                                        borderRadius: 3,
-                                        position: 'relative',
+                            <Card
+                                key={item.id}
+                                elevation={0}
+                                sx={{
+                                    height: '100%',
+                                    borderRadius: 4,
+                                    position: 'relative',
+                                    background: theme.palette.mode === 'dark'
+                                        ? 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'
+                                        : '#ffffff',
+                                    border: '1px solid',
+                                    borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    '&:hover': {
+                                        transform: 'translateY(-8px)',
                                         boxShadow: theme.palette.mode === 'dark'
-                                            ? '0 4px 12px rgba(0,0,0,0.3)'
-                                            : '0 4px 12px rgba(0,0,0,0.1)',
-                                        transition: 'transform 0.2s',
-                                        '&:hover': {
-                                            transform: 'translateY(-4px)',
-                                        },
-                                    }}
-                                >
-                                    <CardContent>
-                                        {isAuthorized && (
-                                            <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => handleEdit(item)}
-                                                    sx={{ color: theme.palette.primary.main }}
-                                                >
-                                                    <EditIcon fontSize="small" />
-                                                </IconButton>
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => handleDelete(item.id)}
-                                                    sx={{ color: theme.palette.error.main }}
-                                                >
-                                                    <DeleteIcon fontSize="small" />
-                                                </IconButton>
-                                            </Box>
-                                        )}
+                                            ? '0 20px 40px rgba(0,0,0,0.4)'
+                                            : '0 20px 40px rgba(0,0,0,0.1)',
+                                    },
+                                    overflow: 'visible',
+                                }}
+                            >
+                                <CardContent sx={{ p: 4, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                    {isAuthorized && (
+                                        <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => handleEdit(item)}
+                                                sx={{
+                                                    color: theme.palette.primary.main,
+                                                    bgcolor: 'rgba(102, 126, 234, 0.1)',
+                                                    mr: 1,
+                                                    '&:hover': { bgcolor: 'rgba(102, 126, 234, 0.2)' }
+                                                }}
+                                            >
+                                                <EditIcon fontSize="small" />
+                                            </IconButton>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => handleDelete(item.id)}
+                                                sx={{
+                                                    color: theme.palette.error.main,
+                                                    bgcolor: 'rgba(244, 67, 54, 0.1)',
+                                                    '&:hover': { bgcolor: 'rgba(244, 67, 54, 0.2)' }
+                                                }}
+                                            >
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                        </Box>
+                                    )}
 
-                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                            <WalletIcon sx={{ fontSize: 32, color: theme.palette.primary.main, mr: 1 }} />
-                                            <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                                                Year: {item.year}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
+                                        <Box sx={{
+                                            p: 2,
+                                            borderRadius: 2,
+                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                            boxShadow: '0 4px 14px 0 rgba(118, 75, 162, 0.3)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            mr: 2
+                                        }}>
+                                            <WalletIcon sx={{ fontSize: 32, color: '#fff' }} />
+                                        </Box>
+                                        <Box>
+                                            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 600, letterSpacing: 1 }}>
+                                                FINANCIAL YEAR
+                                            </Typography>
+                                            <Typography variant="h4" sx={{ fontWeight: 800 }}>
+                                                {item.year}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+
+                                    <Box sx={{
+                                        display: 'grid',
+                                        gridTemplateColumns: '1fr 1fr',
+                                        gap: 2,
+                                        mb: 4
+                                    }}>
+                                        {[
+                                            { label: 'Permanent', value: item.permanentAmount },
+                                            { label: 'Temporary', value: item.temporaryAmount },
+                                            { label: 'Junior', value: item.juniorAmount },
+                                            { label: 'Village', value: item.villageContribution },
+                                            { label: 'Other', value: item.otherContributions },
+                                        ].map((stat, index) => (
+                                            <Box key={index} sx={{
+                                                p: 1.5,
+                                                borderRadius: 2,
+                                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                                                border: '1px solid',
+                                                borderColor: theme.palette.divider
+                                            }}>
+                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                                                    {stat.label}
+                                                </Typography>
+                                                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                                                    ₹{(stat.value || 0).toLocaleString()}
+                                                </Typography>
+                                            </Box>
+                                        ))}
+                                    </Box>
+
+                                    <Box sx={{ mt: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <Typography variant="body2" color="text.secondary">Total Received</Typography>
+                                            <Typography variant="subtitle1" sx={{ color: '#00c853', fontWeight: 700 }}>
+                                                ₹{totalReceived.toLocaleString()}
+                                            </Typography>
+                                        </Box>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <Typography variant="body2" color="text.secondary">Total Spent</Typography>
+                                            <Typography variant="subtitle1" sx={{ color: '#ff3d00', fontWeight: 700 }}>
+                                                ₹{item.amountSpent.toLocaleString()}
                                             </Typography>
                                         </Box>
 
-                                        <Divider sx={{ mb: 2 }} />
+                                        <Divider />
 
-                                        <Grid container spacing={2}>
-                                            <Grid item xs={12} sm={6}>
-                                                <Typography variant="body2" color="text.secondary">Permanent Membership</Typography>
-                                                <Typography variant="subtitle1" fontWeight="600">₹{item.permanentAmount.toLocaleString()}</Typography>
-                                            </Grid>
-                                            <Grid item xs={12} sm={6}>
-                                                <Typography variant="body2" color="text.secondary">Temporary Membership</Typography>
-                                                <Typography variant="subtitle1" fontWeight="600">₹{item.temporaryAmount.toLocaleString()}</Typography>
-                                            </Grid>
-                                            <Grid item xs={12} sm={6}>
-                                                <Typography variant="body2" color="text.secondary">Junior Membership</Typography>
-                                                <Typography variant="subtitle1" fontWeight="600">₹{item.juniorAmount.toLocaleString()}</Typography>
-                                            </Grid>
-                                            <Grid item xs={12} sm={6}>
-                                                <Typography variant="body2" color="text.secondary">Village Contribution</Typography>
-                                                <Typography variant="subtitle1" fontWeight="600">₹{item.villageContribution.toLocaleString()}</Typography>
-                                            </Grid>
-                                            <Grid item xs={12} sm={6}>
-                                                <Typography variant="body2" color="text.secondary">Other Contributions</Typography>
-                                                <Typography variant="subtitle1" fontWeight="600">₹{(item.otherContributions || 0).toLocaleString()}</Typography>
-                                            </Grid>
-                                        </Grid>
-
-                                        <Box sx={{ mt: 3, p: 2, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', borderRadius: 2 }}>
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                                <Typography variant="body2">Total Received:</Typography>
-                                                <Typography variant="subtitle2" color="success.main" fontWeight="700">₹{totalReceived.toLocaleString()}</Typography>
-                                            </Box>
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                                <Typography variant="body2">Total Spent:</Typography>
-                                                <Typography variant="subtitle2" color="error.main" fontWeight="700">₹{item.amountSpent.toLocaleString()}</Typography>
-                                            </Box>
-                                            <Divider sx={{ my: 1 }} />
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                                <Typography variant="subtitle1" fontWeight="700">Total Chit Fund Amount:</Typography>
-                                                <Typography variant="h6" color="primary.main" fontWeight="700">₹{balance.toLocaleString()}</Typography>
-                                            </Box>
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                <Typography variant="subtitle1" fontWeight="700">Grand Total:</Typography>
-                                                <Typography variant="h6" color="secondary.main" fontWeight="700">₹{(item.grandTotal || 0).toLocaleString()}</Typography>
-                                            </Box>
+                                        <Box sx={{
+                                            p: 2,
+                                            borderRadius: 2,
+                                            background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center'
+                                        }}>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#667eea' }}>
+                                                Grand Total
+                                            </Typography>
+                                            <Typography variant="h5" sx={{
+                                                fontWeight: 800,
+                                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                                WebkitBackgroundClip: 'text',
+                                                WebkitTextFillColor: 'transparent'
+                                            }}>
+                                                ₹{(item.grandTotal || 0).toLocaleString()}
+                                            </Typography>
                                         </Box>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
+                                    </Box>
+                                </CardContent>
+                            </Card>
                         );
                     })}
 
                 {chitFunds.length === 0 && (
-                    <Grid item xs={12}>
-                        <Box sx={{ textAlign: 'center', py: 8 }}>
-                            <Typography variant="h6" color="text.secondary">
-                                No chit fund details added yet
-                            </Typography>
-                        </Box>
-                    </Grid>
+                    <Box sx={{ textAlign: 'center', py: 8, gridColumn: '1/-1' }}>
+                        <Typography variant="h6" color="text.secondary">
+                            No chit fund details added yet
+                        </Typography>
+                    </Box>
                 )}
-            </Grid>
+            </Box>
 
             <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
                 <DialogTitle>

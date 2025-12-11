@@ -166,44 +166,59 @@ function Dashboard() {
 
     const StatCard = ({ title, count, icon, color }) => (
         <Card
+            elevation={0}
             sx={{
-                minHeight: 200,
-                borderRadius: 3,
+                height: '100%',
+                borderRadius: 4,
+                background: theme.palette.mode === 'dark'
+                    ? 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'
+                    : '#ffffff',
+                border: '1px solid',
+                borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
                 boxShadow: theme.palette.mode === 'dark'
-                    ? '0 4px 12px rgba(0,0,0,0.3)'
-                    : '0 4px 12px rgba(0,0,0,0.1)',
-                transition: 'transform 0.2s',
+                    ? '0 8px 32px rgba(0,0,0,0.2)'
+                    : '0 8px 32px rgba(0,0,0,0.05)',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {
-                    transform: 'translateY(-4px)',
+                    transform: 'translateY(-5px)',
+                    boxShadow: theme.palette.mode === 'dark'
+                        ? '0 12px 40px rgba(0,0,0,0.3)'
+                        : '0 12px 40px rgba(0,0,0,0.1)',
+                    borderColor: `${color}80`,
                 },
+                position: 'relative',
+                overflow: 'hidden',
             }}
         >
-            <CardContent sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                p: 3,
-                height: '100%',
-            }}>
+            <Box sx={{
+                position: 'absolute',
+                top: -20,
+                right: -20,
+                width: 100,
+                height: 100,
+                background: `radial-gradient(circle, ${color}20 0%, transparent 70%)`,
+                borderRadius: '50%',
+            }} />
+
+            <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Avatar
                     variant="rounded"
                     sx={{
                         bgcolor: `${color}15`,
                         color: color,
-                        width: 56,
-                        height: 56,
-                        mb: 2,
+                        width: 60,
+                        height: 60,
+                        borderRadius: 3,
                     }}
                 >
                     {icon}
                 </Avatar>
-                <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5 }}>
+                <Box>
+                    <Typography variant="h4" sx={{ fontWeight: 800, mb: 0 }}>
                         {count}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                        {title}
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600, letterSpacing: 0.5 }}>
+                        {title.toUpperCase()}
                     </Typography>
                 </Box>
             </CardContent>
@@ -211,237 +226,238 @@ function Dashboard() {
     );
 
     return (
-        <Box sx={{ p: 3 }}>
-            <Typography variant="h4" sx={{ fontWeight: 700, mb: 4 }}>
-                {t('dashboard')}
-            </Typography>
+        <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1600, mx: 'auto' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
+                <Typography variant="h4" sx={{ fontWeight: 800 }}>
+                    {t('dashboard')}
+                </Typography>
+            </Box>
 
-            {/* Stats Cards */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid item xs={12} sm={6} md={4}>
-                    <StatCard
-                        title={t('permanentMembers')}
-                        count={stats.permanentMembers}
-                        icon={<PeopleIcon fontSize="large" />}
-                        color="#667eea"
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                    <StatCard
-                        title={t('temporaryMembers')}
-                        count={stats.temporaryMembers}
-                        icon={<PersonOutlineIcon fontSize="large" />}
-                        color="#764ba2"
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                    <StatCard
-                        title={t('juniorMembers')}
-                        count={stats.juniorMembers}
-                        icon={<ChildCareIcon fontSize="large" />}
-                        color="#EC4899"
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                    <StatCard
-                        title={t('sponsors')}
-                        count={stats.sponsors}
-                        icon={<StoreIcon fontSize="large" />}
-                        color="#10B981"
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                    <StatCard
-                        title={t('winners')}
-                        count={stats.winners}
-                        icon={<TrophyIcon fontSize="large" />}
-                        color="#F59E0B"
-                    />
-                </Grid>
-            </Grid>
+            {/* Stats Grid - Fixed Grid Syntax */}
+            <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                gap: 3,
+                mb: 6
+            }}>
+                <StatCard
+                    title={t('permanentMembers')}
+                    count={stats.permanentMembers}
+                    icon={<PeopleIcon fontSize="medium" />}
+                    color="#6366f1"
+                />
+                <StatCard
+                    title={t('temporaryMembers')}
+                    count={stats.temporaryMembers}
+                    icon={<PersonOutlineIcon fontSize="medium" />}
+                    color="#8b5cf6"
+                />
+                <StatCard
+                    title={t('juniorMembers')}
+                    count={stats.juniorMembers}
+                    icon={<ChildCareIcon fontSize="medium" />}
+                    color="#ec4899"
+                />
+                <StatCard
+                    title={t('sponsors')}
+                    count={stats.sponsors}
+                    icon={<StoreIcon fontSize="medium" />}
+                    color="#10b981"
+                />
+                <StatCard
+                    title={t('winners')}
+                    count={stats.winners}
+                    icon={<TrophyIcon fontSize="medium" />}
+                    color="#f59e0b"
+                />
+            </Box>
 
             {/* Announcements Section */}
-            <Box sx={{ mt: 5 }}>
-                <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>
-                    {t('announcements')}
-                </Typography>
+            <Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                        {t('announcements')}
+                    </Typography>
+                </Box>
 
-                {/* Add Announcement Form - Only for Authorized Users */}
+                {/* Add Announcement Form */}
                 {isAuthorized && (
                     <Paper
                         elevation={0}
                         sx={{
                             p: 3,
                             mb: 4,
-                            borderRadius: 3,
-                            border: `1px solid ${theme.palette.divider}`,
+                            borderRadius: 4,
+                            border: '1px solid',
+                            borderColor: theme.palette.divider,
+                            background: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : '#fff',
                         }}
                     >
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                            <CampaignIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                            <Avatar sx={{ bgcolor: theme.palette.primary.main, mr: 2 }}>
+                                <CampaignIcon />
+                            </Avatar>
                             <Typography variant="h6" sx={{ fontWeight: 600 }}>
                                 {editingId ? t('editAnnouncement') : t('addNewAnnouncement')}
                             </Typography>
                         </Box>
 
-                        <Grid container spacing={2}>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    fullWidth
-                                    label={t('heading')}
-                                    name="heading"
-                                    value={formData.heading}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter announcement heading"
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    fullWidth
-                                    label={t('year')}
-                                    name="year"
-                                    type="number"
-                                    value={formData.year}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter year"
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
+                        <Box sx={{
+                            display: 'grid',
+                            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                            gap: 3
+                        }}>
+                            <TextField
+                                fullWidth
+                                label={t('heading')}
+                                name="heading"
+                                value={formData.heading}
+                                onChange={handleInputChange}
+                                placeholder="Enter heading"
+                                variant="outlined"
+                            />
+                            <TextField
+                                fullWidth
+                                label={t('year')}
+                                name="year"
+                                type="number"
+                                value={formData.year}
+                                onChange={handleInputChange}
+                                placeholder="Year"
+                                variant="outlined"
+                            />
+                            <Box sx={{ gridColumn: '1 / -1' }}>
                                 <TextField
                                     fullWidth
                                     label={t('description')}
                                     name="description"
                                     value={formData.description}
                                     onChange={handleInputChange}
-                                    placeholder="Enter announcement description"
+                                    placeholder="Enter description"
                                     multiline
                                     rows={3}
+                                    variant="outlined"
                                 />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Box sx={{ display: 'flex', gap: 1 }}>
+                            </Box>
+                            <Box sx={{ gridColumn: '1 / -1', display: 'flex', gap: 1 }}>
+                                <Button
+                                    variant="contained"
+                                    onClick={handleAddAnnouncement}
+                                    disabled={!formData.heading || !formData.year || !formData.description}
+                                    sx={{
+                                        px: 4,
+                                        py: 1.2,
+                                        borderRadius: 2,
+                                        fontWeight: 600,
+                                        boxShadow: '0 4px 14px 0 rgba(0,0,0,0.2)',
+                                        background: theme.palette.primary.main,
+                                    }}
+                                >
+                                    {editingId ? t('update') : t('add')}
+                                </Button>
+                                {editingId && (
                                     <Button
-                                        variant="contained"
-                                        startIcon={editingId ? <EditIcon /> : <AddIcon />}
-                                        onClick={handleAddAnnouncement}
-                                        disabled={!formData.heading || !formData.year || !formData.description}
-                                        sx={{
-                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                            '&:hover': {
-                                                background: 'linear-gradient(135deg, #5568d3 0%, #63408a 100%)',
-                                            },
-                                        }}
+                                        variant="text"
+                                        onClick={handleCancelEdit}
+                                        sx={{ borderRadius: 2 }}
                                     >
-                                        {editingId ? t('update') : t('add')}
+                                        {t('cancel')}
                                     </Button>
-                                    {editingId && (
-                                        <Button
-                                            variant="outlined"
-                                            onClick={handleCancelEdit}
-                                        >
-                                            {t('cancel')}
-                                        </Button>
-                                    )}
-                                </Box>
-                            </Grid>
-                        </Grid>
+                                )}
+                            </Box>
+                        </Box>
                     </Paper>
                 )}
 
-                {!isAuthorized && (
-                    <Alert severity="info" sx={{ mb: 3 }}>
-                        Only authorized users (Admin/Manager) can add or manage announcements.
-                    </Alert>
-                )}
-
-                {/* Display Announcements */}
-                <Grid container spacing={3}>
+                {/* Announcements Grid */}
+                <Box sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                    gap: 3
+                }}>
                     {announcements.map((announcement) => (
-                        <Grid item xs={12} md={4} key={announcement.id}>
-                            <Card
-                                sx={{
-                                    height: 280,
-                                    borderRadius: 3,
-                                    boxShadow: theme.palette.mode === 'dark'
-                                        ? '0 4px 12px rgba(0,0,0,0.3)'
-                                        : '0 4px 12px rgba(0,0,0,0.1)',
-                                    transition: 'transform 0.2s',
-                                    '&:hover': {
-                                        transform: 'translateY(-4px)',
-                                    },
-                                    position: 'relative',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                }}
-                            >
-                                <CardContent sx={{
-                                    flex: 1,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'center',
-                                    p: 3,
-                                }}>
-                                    {isAuthorized && (
-                                        <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => handleEdit(announcement)}
-                                                sx={{ color: theme.palette.primary.main }}
-                                            >
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => handleDelete(announcement.id)}
-                                                sx={{ color: theme.palette.error.main }}
-                                            >
-                                                <DeleteIcon fontSize="small" />
-                                            </IconButton>
-                                        </Box>
-                                    )}
-
-                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                        <Avatar
-                                            sx={{
-                                                bgcolor: 'rgba(102, 126, 234, 0.1)',
-                                                color: theme.palette.primary.main,
-                                                mr: 2,
-                                            }}
-                                        >
-                                            <CampaignIcon />
-                                        </Avatar>
-                                        <Box sx={{ flex: 1 }}>
-                                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
+                        <Card
+                            key={announcement.id}
+                            elevation={0}
+                            sx={{
+                                height: '100%',
+                                minHeight: 250,
+                                borderRadius: 4,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                background: theme.palette.mode === 'dark'
+                                    ? 'rgba(255,255,255,0.03)'
+                                    : '#ffffff',
+                                border: '1px solid',
+                                borderColor: theme.palette.divider,
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    transform: 'translateY(-4px)',
+                                    boxShadow: '0 12px 40px rgba(0,0,0,0.08)',
+                                    borderColor: theme.palette.primary.main,
+                                },
+                            }}
+                        >
+                            <CardContent sx={{ p: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                    <Box sx={{ display: 'flex', gap: 2 }}>
+                                        <Box sx={{
+                                            width: 4,
+                                            height: 40,
+                                            borderRadius: 2,
+                                            bgcolor: theme.palette.primary.main
+                                        }} />
+                                        <Box>
+                                            <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
                                                 {announcement.heading}
                                             </Typography>
-                                            <Typography variant="caption" color="text.secondary">
-                                                {t('year')}: {announcement.year}
+                                            <Typography variant="caption" sx={{
+                                                display: 'inline-block',
+                                                mt: 0.5,
+                                                px: 1,
+                                                py: 0.25,
+                                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                                borderRadius: 1,
+                                                fontWeight: 600
+                                            }}>
+                                                {announcement.year}
                                             </Typography>
                                         </Box>
                                     </Box>
 
-                                    <Divider sx={{ mb: 2 }} />
+                                    {isAuthorized && (
+                                        <Box>
+                                            <IconButton size="small" onClick={() => handleEdit(announcement)}>
+                                                <EditIcon fontSize="small" />
+                                            </IconButton>
+                                            <IconButton size="small" onClick={() => handleDelete(announcement.id)} color="error">
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                        </Box>
+                                    )}
+                                </Box>
 
-                                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
-                                        {announcement.description}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
+                                <Typography variant="body2" color="text.secondary" sx={{ flex: 1, lineHeight: 1.7 }}>
+                                    {announcement.description}
+                                </Typography>
+                            </CardContent>
+                        </Card>
                     ))}
-                </Grid>
+                </Box>
 
                 {announcements.length === 0 && (
-                    <Box sx={{ textAlign: 'center', py: 8 }}>
-                        <CampaignIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+                    <Box sx={{
+                        textAlign: 'center',
+                        py: 8,
+                        bgcolor: theme.palette.action.hover,
+                        borderRadius: 4,
+                        border: '1px dashed',
+                        borderColor: theme.palette.divider
+                    }}>
+                        <CampaignIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
                         <Typography variant="h6" color="text.secondary">
                             {t('noAnnouncements')}
                         </Typography>
-                        {isAuthorized && (
-                            <Typography variant="body2" color="text.secondary">
-                                Add your first announcement using the form above
-                            </Typography>
-                        )}
                     </Box>
                 )}
             </Box>

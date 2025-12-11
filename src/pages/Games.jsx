@@ -156,9 +156,9 @@ function Games() {
     };
 
     return (
-        <Box sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+        <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1600, mx: 'auto' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                <Typography variant="h4" sx={{ fontWeight: 800 }}>
                     Games
                 </Typography>
                 {isAuthorized && (
@@ -167,9 +167,15 @@ function Games() {
                         startIcon={<AddIcon />}
                         onClick={handleOpenDialog}
                         sx={{
+                            borderRadius: 2,
+                            px: 3,
+                            py: 1,
                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            boxShadow: '0 4px 14px 0 rgba(118, 75, 162, 0.3)',
                             '&:hover': {
                                 background: 'linear-gradient(135deg, #5568d3 0%, #63408a 100%)',
+                                transform: 'translateY(-1px)',
+                                boxShadow: '0 6px 20px 0 rgba(118, 75, 162, 0.4)',
                             },
                         }}
                     >
@@ -179,113 +185,152 @@ function Games() {
             </Box>
 
             {!isAuthorized && (
-                <Alert severity="info" sx={{ mb: 3 }}>
+                <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
                     You don't have permission to add, edit, or delete games. Only authorized users can perform these actions.
                 </Alert>
             )}
 
-            {/* Games Grid */}
-            <Grid container spacing={3}>
+            {/* Games Grid - Fixed Grid Syntax */}
+            <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                gap: 3,
+                animation: 'fadeIn 0.5s ease-in-out',
+                '@keyframes fadeIn': {
+                    '0%': { opacity: 0, transform: 'translateY(20px)' },
+                    '100%': { opacity: 1, transform: 'translateY(0)' },
+                }
+            }}>
                 {games.map((game) => (
-                    <Grid item xs={12} sm={6} md={4} key={game.id}>
-                        <Card
-                            sx={{
-                                height: 400,
-                                borderRadius: 3,
-                                position: 'relative',
+                    <Card
+                        key={game.id}
+                        elevation={0}
+                        sx={{
+                            height: '100%',
+                            borderRadius: 4,
+                            position: 'relative',
+                            background: theme.palette.mode === 'dark'
+                                ? 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'
+                                : '#ffffff',
+                            border: '1px solid',
+                            borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-8px)',
                                 boxShadow: theme.palette.mode === 'dark'
-                                    ? '0 4px 12px rgba(0,0,0,0.3)'
-                                    : '0 4px 12px rgba(0,0,0,0.1)',
-                                transition: 'transform 0.2s',
-                                '&:hover': {
-                                    transform: 'translateY(-4px)',
-                                },
+                                    ? '0 20px 40px rgba(0,0,0,0.4)'
+                                    : '0 20px 40px rgba(0,0,0,0.1)',
+                                '& .game-actions': {
+                                    opacity: 1,
+                                    transform: 'translateY(0)',
+                                }
+                            },
+                            display: 'flex',
+                            flexDirection: 'column',
+                            overflow: 'visible',
+                        }}
+                    >
+                        <CardContent sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            {/* Header Background */}
+                            <Box sx={{
+                                height: 80,
+                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                borderRadius: '16px 16px 0 0',
+                                position: 'relative',
+                                mb: 4,
                                 display: 'flex',
-                                flexDirection: 'column',
-                            }}
-                        >
-                            <CardContent sx={{
-                                flex: 1,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'center',
                                 alignItems: 'center',
-                                textAlign: 'center',
-                                p: 3,
+                                justifyContent: 'center'
                             }}>
+                                <TrophyIcon sx={{ fontSize: 40, color: 'rgba(255,255,255,0.3)' }} />
+
                                 {/* Edit/Delete Buttons */}
                                 {isAuthorized && (
-                                    <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
+                                    <Box
+                                        className="game-actions"
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 8,
+                                            right: 8,
+                                            opacity: 0,
+                                            transition: 'all 0.3s ease',
+                                            transform: 'translateY(-10px)',
+                                            display: 'flex',
+                                            gap: 1
+                                        }}
+                                    >
                                         <IconButton
                                             size="small"
                                             onClick={() => handleEdit(game)}
-                                            sx={{ color: theme.palette.primary.main }}
+                                            sx={{
+                                                bgcolor: 'rgba(255,255,255,0.2)',
+                                                color: '#fff',
+                                                '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
+                                            }}
                                         >
                                             <EditIcon fontSize="small" />
                                         </IconButton>
                                         <IconButton
                                             size="small"
                                             onClick={() => handleDelete(game.id)}
-                                            sx={{ color: theme.palette.error.main }}
+                                            sx={{
+                                                bgcolor: 'rgba(255,0,0,0.2)',
+                                                color: '#fff',
+                                                '&:hover': { bgcolor: 'rgba(255,0,0,0.4)' }
+                                            }}
                                         >
                                             <DeleteIcon fontSize="small" />
                                         </IconButton>
                                     </Box>
                                 )}
+                            </Box>
 
-                                {/* Game Name */}
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                                    <TrophyIcon sx={{ color: theme.palette.primary.main }} />
-                                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                        {game.gameName}
-                                    </Typography>
-                                </Box>
+                            <Box sx={{ px: 3, pb: 4, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                <Typography variant="h5" sx={{ fontWeight: 800, mb: 1.5, textAlign: 'center' }}>
+                                    {game.gameName}
+                                </Typography>
 
-                                {/* Participants Count */}
-                                <Box sx={{ mb: 2 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
                                     <Chip
-                                        icon={<PeopleIcon />}
+                                        icon={<PeopleIcon sx={{ fontSize: '1rem !important' }} />}
                                         label={`${game.participantsCount} Participants`}
-                                        color="primary"
-                                        variant="outlined"
-                                        size="small"
+                                        sx={{
+                                            bgcolor: 'rgba(118, 75, 162, 0.1)',
+                                            color: '#764ba2',
+                                            fontWeight: 600,
+                                            height: 28
+                                        }}
                                     />
                                 </Box>
 
-                                {/* Description */}
-                                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 3, flex: 1 }}>
                                     {game.description}
                                 </Typography>
-
-                                <Divider sx={{ mb: 2, width: '100%' }} />
 
                                 {/* Winner Section */}
                                 <Box
                                     sx={{
                                         p: 2,
-                                        borderRadius: 2,
-                                        background: theme.palette.mode === 'dark'
-                                            ? 'rgba(255, 215, 0, 0.1)'
-                                            : 'rgba(255, 215, 0, 0.15)',
-                                        border: '2px solid',
-                                        borderColor: theme.palette.mode === 'dark'
-                                            ? 'rgba(255, 215, 0, 0.3)'
-                                            : 'rgba(255, 215, 0, 0.5)',
-                                        width: '100%',
+                                        borderRadius: 3,
+                                        background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 165, 0, 0.05) 100%)',
+                                        border: '1px solid',
+                                        borderColor: 'rgba(255, 215, 0, 0.3)',
+                                        mt: 'auto'
                                     }}
                                 >
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'center' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                         {/* Winner Image */}
                                         <Avatar
                                             src={game.winnerImage}
                                             alt={game.winnerName}
                                             sx={{
-                                                width: 60,
-                                                height: 60,
-                                                border: '3px solid gold',
+                                                width: 50,
+                                                height: 50,
+                                                border: '2px solid #FFD700',
                                                 background: game.winnerImage
                                                     ? 'transparent'
                                                     : 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                                                boxShadow: '0 4px 10px rgba(255, 215, 0, 0.2)'
                                             }}
                                         >
                                             {!game.winnerImage && game.winnerName.charAt(0).toUpperCase()}
@@ -293,20 +338,20 @@ function Games() {
 
                                         {/* Winner Info */}
                                         <Box>
-                                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                                            <Typography variant="caption" sx={{ color: '#DAA520', fontWeight: 700, display: 'block', mb: 0.5, letterSpacing: 0.5, textTransform: 'uppercase' }}>
                                                 🏆 Winner
                                             </Typography>
-                                            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#FFD700' }}>
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: theme.palette.text.primary, lineHeight: 1.2 }}>
                                                 {game.winnerName}
                                             </Typography>
                                         </Box>
                                     </Box>
                                 </Box>
-                            </CardContent>
-                        </Card>
-                    </Grid>
+                            </Box>
+                        </CardContent>
+                    </Card>
                 ))}
-            </Grid>
+            </Box>
 
             {games.length === 0 && (
                 <Box sx={{ textAlign: 'center', py: 8 }}>

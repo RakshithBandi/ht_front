@@ -3,7 +3,7 @@ const API_URL = `${API_BASE_URL}/api/profile`;
 
 const profileAPI = {
     getProfile: async () => {
-        const response = await fetch(`${API_BASE_URL}/me/`, {
+        const response = await fetch(`${API_URL}/me/`, {
             credentials: 'include'
         });
         if (!response.ok) {
@@ -14,7 +14,7 @@ const profileAPI = {
     },
 
     updateProfile: async (profileData) => {
-        const response = await fetch(`${API_BASE_URL}/me/`, {
+        const response = await fetch(`${API_URL}/me/`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

@@ -5,6 +5,7 @@ import {
     Tab,
     Paper,
     useTheme,
+    Typography,
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -75,22 +76,33 @@ function Settings() {
     };
 
     return (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1200, mx: 'auto' }}>
+            <Box sx={{ mb: 4 }}>
+                <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>
+                    Settings
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                    Manage your account settings and preferences
+                </Typography>
+            </Box>
+
             <Paper
                 elevation={0}
                 sx={{
-                    borderRadius: 3,
+                    borderRadius: 4,
                     overflow: 'hidden',
-                    boxShadow: theme.palette.mode === 'dark'
-                        ? '0 4px 12px rgba(0,0,0,0.3)'
-                        : '0 4px 12px rgba(0,0,0,0.1)',
+                    background: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : '#fff',
+                    border: '1px solid',
+                    borderColor: theme.palette.divider,
                 }}
-            >   
+            >
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs
                         value={currentTab}
                         onChange={handleTabChange}
                         aria-label="settings tabs"
+                        variant="scrollable"
+                        scrollButtons="auto"
                         sx={{
                             px: 2,
                             '& .MuiTab-root': {
@@ -98,7 +110,17 @@ function Settings() {
                                 fontWeight: 600,
                                 fontSize: '1rem',
                                 minHeight: 64,
+                                mr: 2,
+                                color: 'text.secondary',
+                                '&.Mui-selected': {
+                                    color: '#667eea',
+                                }
                             },
+                            '& .MuiTabs-indicator': {
+                                backgroundColor: '#667eea',
+                                height: 3,
+                                borderRadius: '3px 3px 0 0',
+                            }
                         }}
                     >
                         <Tab
@@ -132,21 +154,23 @@ function Settings() {
                     </Tabs>
                 </Box>
 
-                <TabPanel value={currentTab} index={0}>
-                    <Profile />
-                </TabPanel>
+                <Box sx={{ minHeight: 400 }}>
+                    <TabPanel value={currentTab} index={0}>
+                        <Profile />
+                    </TabPanel>
 
-                <TabPanel value={currentTab} index={1}>
-                    <Users />
-                </TabPanel>
+                    <TabPanel value={currentTab} index={1}>
+                        <Users />
+                    </TabPanel>
 
-                <TabPanel value={currentTab} index={2}>
-                    <NotificationsPage />
-                </TabPanel>
+                    <TabPanel value={currentTab} index={2}>
+                        <NotificationsPage />
+                    </TabPanel>
 
-                <TabPanel value={currentTab} index={3}>
-                    <LanguageSettings />
-                </TabPanel>
+                    <TabPanel value={currentTab} index={3}>
+                        <LanguageSettings />
+                    </TabPanel>
+                </Box>
             </Paper>
         </Box>
     );

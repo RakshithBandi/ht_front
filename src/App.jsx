@@ -19,6 +19,7 @@ import Sponsors from './pages/Sponsors';
 import Memories from './pages/Memories';
 import ChitFund from './pages/ChitFund';
 import Expenditures from './pages/Expenditures';
+import Quiz from './pages/Quiz';
 import Settings from './pages/Settings';
 import Users from './pages/Users';
 import Profile from './pages/Profile';
@@ -287,7 +288,27 @@ function App() {
                 }
               />
               <Route
+                path="/quiz"
+                element={
+                  <ProtectedRoute>
+                    <HomePage toggleTheme={toggleTheme} isDarkMode={isDarkMode}>
+                      <Quiz />
+                    </HomePage>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/settings/notifications"
+                element={
+                  <ProtectedRoute>
+                    <HomePage toggleTheme={toggleTheme} isDarkMode={isDarkMode}>
+                      <Settings />
+                    </HomePage>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings/language"
                 element={
                   <ProtectedRoute>
                     <HomePage toggleTheme={toggleTheme} isDarkMode={isDarkMode}>

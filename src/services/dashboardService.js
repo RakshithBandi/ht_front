@@ -3,7 +3,7 @@ const API_URL = `${API_BASE_URL}/api/dashboard`;
 
 const dashboardService = {
     getStats: async () => {
-        const response = await fetch(`${API_BASE_URL}/stats/`, {
+        const response = await fetch(`${API_URL}/stats/`, {
             credentials: 'include'
         });
         if (!response.ok) throw new Error('Failed to fetch dashboard stats');
@@ -11,7 +11,7 @@ const dashboardService = {
     },
 
     getAnnouncements: async () => {
-        const response = await fetch(`${API_BASE_URL}/announcements/`, {
+        const response = await fetch(`${API_URL}/announcements/`, {
             credentials: 'include'
         });
         if (!response.ok) throw new Error('Failed to fetch announcements');
@@ -19,7 +19,7 @@ const dashboardService = {
     },
 
     createAnnouncement: async (announcementData) => {
-        const response = await fetch(`${API_BASE_URL}/announcements/`, {
+        const response = await fetch(`${API_URL}/announcements/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -33,7 +33,7 @@ const dashboardService = {
     },
 
     updateAnnouncement: async (id, announcementData) => {
-        const response = await fetch(`${API_BASE_URL}/announcements/${id}/`, {
+        const response = await fetch(`${API_URL}/announcements/${id}/`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -47,7 +47,7 @@ const dashboardService = {
     },
 
     deleteAnnouncement: async (id) => {
-        const response = await fetch(`${API_BASE_URL}/announcements/${id}/`, {
+        const response = await fetch(`${API_URL}/announcements/${id}/`, {
             method: 'DELETE',
             credentials: 'include'
         });

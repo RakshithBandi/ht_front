@@ -112,84 +112,71 @@ function Profile() {
 
     return (
         <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                    My Profile
-                </Typography>
-                {!isEditing ? (
-                    <Button
-                        variant="outlined"
-                        startIcon={<Edit />}
-                        onClick={handleEditToggle}
-                        sx={{
-                            textTransform: 'none',
-                            fontWeight: 600,
-                            borderColor: theme.palette.primary.main,
-                            color: theme.palette.primary.main,
-                            '&:hover': {
-                                borderColor: theme.palette.primary.dark,
-                                backgroundColor: 'rgba(102, 126, 234, 0.05)',
-                            },
-                        }}
-                    >
-                        Edit Profile
-                    </Button>
-                ) : (
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                        <Button
-                            variant="outlined"
-                            onClick={handleEditToggle}
-                            sx={{ textTransform: 'none' }}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            variant="contained"
-                            onClick={handleSave}
-                            sx={{
-                                textTransform: 'none',
-                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            }}
-                        >
-                            Save Changes
-                        </Button>
-                    </Box>
-                )}
-            </Box>
-
             <Paper
                 elevation={0}
                 sx={{
-                    borderRadius: 3,
+                    borderRadius: 4,
                     overflow: 'hidden',
-                    border: `1px solid ${theme.palette.divider}`,
+                    background: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : '#fff',
+                    border: '1px solid',
+                    borderColor: theme.palette.divider,
                 }}
             >
                 {/* Profile Header */}
                 <Box
                     sx={{
                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        p: 4,
+                        p: { xs: 3, md: 5 },
+                        pb: { xs: 18, md: 10 },
                         position: 'relative',
+                        display: 'flex',
+                        flexDirection: { xs: 'column', md: 'row' },
+                        alignItems: { xs: 'center', md: 'flex-start' },
+                        gap: 3
                     }}
                 >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                        <Box sx={{ position: 'relative' }}>
-                            <Avatar
-                                src={profilePicture}
-                                sx={{
-                                    width: 120,
-                                    height: 120,
-                                    bgcolor: 'white',
-                                    color: '#667eea',
-                                    fontSize: '3rem',
-                                    fontWeight: 700,
-                                    border: '4px solid white',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                }}
-                            >
-                                {!profilePicture && getInitials(user.fullName)}
-                            </Avatar>
+                    <Avatar
+                        src={profilePicture}
+                        sx={{
+                            width: 140,
+                            height: 140,
+                            bgcolor: 'white',
+                            color: '#667eea',
+                            fontSize: '3.5rem',
+                            fontWeight: 700,
+                            border: '5px solid white',
+                            boxShadow: '0 8px 20px rgba(0,0,0,0.2)',
+                            position: 'absolute',
+                            bottom: -50,
+                            left: { xs: '50%', md: 40 },
+                            transform: { xs: 'translateX(-50%)', md: 'none' }
+                        }}
+                    >
+                        {!profilePicture && getInitials(user.fullName)}
+                    </Avatar>
+
+                    <Box sx={{
+                        ml: { xs: 0, md: 22 },
+                        mt: { xs: 0, md: 2 },
+                        textAlign: { xs: 'center', md: 'left' }
+                    }}>
+                        <Typography variant="h3" sx={{ color: 'white', fontWeight: 800, mb: 1, textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+                            {user.fullName}
+                        </Typography>
+                        <Chip
+                            label="Active Member"
+                            sx={{
+                                backgroundColor: 'rgba(255,255,255,0.2)',
+                                color: 'white',
+                                fontWeight: 700,
+                                backdropFilter: 'blur(10px)',
+                                border: '1px solid rgba(255,255,255,0.3)'
+                            }}
+                        />
+                    </Box>
+
+                    {isEditing && (
+                        <Box sx={{ position: 'absolute', bottom: -40, left: { xs: '50%', md: 130 }, transform: { xs: 'translateX(20px)', md: 'none' }, zIndex: 10 }}>
                             <input
                                 accept="image/*"
                                 style={{ display: 'none' }}
@@ -201,128 +188,190 @@ function Profile() {
                                 <IconButton
                                     component="span"
                                     sx={{
-                                        position: 'absolute',
-                                        bottom: 0,
-                                        right: 0,
                                         bgcolor: 'white',
-                                        boxShadow: 2,
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                                         '&:hover': {
                                             bgcolor: 'rgba(255,255,255,0.9)',
+                                            transform: 'scale(1.1)'
                                         },
+                                        transition: 'all 0.2s'
                                     }}
-                                    size="small"
                                 >
                                     <CameraAlt sx={{ color: '#667eea' }} />
                                 </IconButton>
                             </label>
                         </Box>
-                        <Box>
-                            <Typography variant="h4" sx={{ color: 'white', fontWeight: 700, mb: 1 }}>
-                                {user.fullName}
-                            </Typography>
-                            <Chip
-                                label="Active"
-                                sx={{
-                                    backgroundColor: 'rgba(255,255,255,0.2)',
-                                    color: 'white',
-                                    fontWeight: 600,
-                                    backdropFilter: 'blur(10px)',
-                                }}
-                            />
-                        </Box>
-                    </Box>
+                    )}
                 </Box>
 
                 {/* Profile Details */}
-                <Box sx={{ p: 4 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                        Personal Information
-                    </Typography>
+                <Box sx={{ p: { xs: 3, md: 5 }, pt: { xs: 12, md: 10 } }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
+                        <Typography variant="h5" sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
+                            Personal Information
+                        </Typography>
 
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} md={6}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                <AccountCircle sx={{ color: theme.palette.primary.main }} />
-                                <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                    Full Name
-                                </Typography>
-                            </Box>
-                            {isEditing ? (
-                                <TextField
-                                    fullWidth
-                                    value={user.fullName}
-                                    onChange={(e) => handleChange('fullName', e.target.value)}
+                        {!isEditing ? (
+                            <Button
+                                variant="contained"
+                                startIcon={<Edit />}
+                                onClick={handleEditToggle}
+                                sx={{
+                                    borderRadius: 2,
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    boxShadow: '0 4px 14px 0 rgba(118, 75, 162, 0.3)',
+                                    '&:hover': {
+                                        background: 'linear-gradient(135deg, #5568d3 0%, #63408a 100%)',
+                                        boxShadow: '0 6px 20px 0 rgba(118, 75, 162, 0.4)',
+                                    },
+                                }}
+                            >
+                                Edit Profile
+                            </Button>
+                        ) : (
+                            <Box sx={{ display: 'flex', gap: 1 }}>
+                                <Button
                                     variant="outlined"
-                                />
-                            ) : (
-                                <Typography variant="body1" sx={{ fontWeight: 500, pl: 4 }}>
-                                    {user.fullName}
-                                </Typography>
-                            )}
+                                    onClick={handleEditToggle}
+                                    sx={{ textTransform: 'none', borderRadius: 2 }}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    onClick={handleSave}
+                                    sx={{
+                                        textTransform: 'none',
+                                        borderRadius: 2,
+                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                        boxShadow: '0 4px 14px 0 rgba(118, 75, 162, 0.3)',
+                                        '&:hover': {
+                                            background: 'linear-gradient(135deg, #5568d3 0%, #63408a 100%)',
+                                            boxShadow: '0 6px 20px 0 rgba(118, 75, 162, 0.4)',
+                                        },
+                                    }}
+                                >
+                                    Save Changes
+                                </Button>
+                            </Box>
+                        )}
+                    </Box>
+
+                    <Grid container spacing={4}>
+                        <Grid item xs={12} md={6}>
+                            <Box sx={{ p: 3, borderRadius: 3, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', height: '100%' }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+                                    <AccountCircle sx={{ color: '#667eea', fontSize: 28 }} />
+                                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                        Contact Details
+                                    </Typography>
+                                </Box>
+
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                                    <Box>
+                                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600, mb: 1 }}>
+                                            Full Name
+                                        </Typography>
+                                        {isEditing ? (
+                                            <TextField
+                                                fullWidth
+                                                size="small"
+                                                value={user.fullName}
+                                                onChange={(e) => handleChange('fullName', e.target.value)}
+                                                variant="outlined"
+                                                sx={{ bgcolor: theme.palette.background.paper }}
+                                            />
+                                        ) : (
+                                            <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                                {user.fullName}
+                                            </Typography>
+                                        )}
+                                    </Box>
+
+                                    <Box>
+                                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600, mb: 1 }}>
+                                            Email Address
+                                        </Typography>
+                                        <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                            {user.email}
+                                        </Typography>
+                                    </Box>
+
+                                    <Box>
+                                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600, mb: 1 }}>
+                                            Phone Number
+                                        </Typography>
+                                        {isEditing ? (
+                                            <TextField
+                                                fullWidth
+                                                size="small"
+                                                value={user.phone || ''}
+                                                onChange={(e) => handleChange('phone', e.target.value)}
+                                                variant="outlined"
+                                                placeholder="Enter phone number"
+                                                sx={{ bgcolor: theme.palette.background.paper }}
+                                            />
+                                        ) : (
+                                            <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                                {user.phone || 'Not provided'}
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                </Box>
+                            </Box>
                         </Grid>
 
                         <Grid item xs={12} md={6}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                <Email sx={{ color: theme.palette.primary.main }} />
-                                <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                    Email Address
-                                </Typography>
+                            <Box sx={{ p: 3, borderRadius: 3, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', height: '100%' }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', bgcolor: 'rgba(102, 126, 234, 0.2)', color: '#667eea' }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 800 }}>ID</Typography>
+                                    </Box>
+                                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                        Account Credentials
+                                    </Typography>
+                                </Box>
+
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                                    <Box>
+                                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600, mb: 1 }}>
+                                            Username
+                                        </Typography>
+                                        <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                            {user.username || user.email.split('@')[0]}
+                                        </Typography>
+                                    </Box>
+
+                                    <Box>
+                                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600, mb: 1 }}>
+                                            Password
+                                        </Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <Typography variant="body1" sx={{ fontWeight: 500, letterSpacing: 2 }}>
+                                                ••••••••
+                                            </Typography>
+                                            <Button size="small" sx={{ textTransform: 'none', minWidth: 'auto', p: 0.5 }}>
+                                                Change
+                                            </Button>
+                                        </Box>
+                                    </Box>
+
+                                    <Box>
+                                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600, mb: 1 }}>
+                                            Role
+                                        </Typography>
+                                        <Chip
+                                            label={user.role || 'Member'}
+                                            size="small"
+                                            color="primary"
+                                            variant="outlined"
+                                            sx={{ fontWeight: 600 }}
+                                        />
+                                    </Box>
+                                </Box>
                             </Box>
-                            <Typography variant="body1" sx={{ fontWeight: 500, pl: 4 }}>
-                                {user.email}
-                            </Typography>
-                        </Grid>
-
-                        <Grid item xs={12} md={6}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                <Phone sx={{ color: theme.palette.primary.main }} />
-                                <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                    Phone Number
-                                </Typography>
-                            </Box>
-                            {isEditing ? (
-                                <TextField
-                                    fullWidth
-                                    value={user.phone || ''}
-                                    onChange={(e) => handleChange('phone', e.target.value)}
-                                    variant="outlined"
-                                    placeholder="Enter phone number"
-                                />
-                            ) : (
-                                <Typography variant="body1" sx={{ fontWeight: 500, pl: 4 }}>
-                                    {user.phone || 'Not provided'}
-                                </Typography>
-                            )}
-                        </Grid>
-                    </Grid>
-
-                    <Divider sx={{ my: 4 }} />
-
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                        Account Credentials
-                    </Typography>
-
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} md={6}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                    Username
-                                </Typography>
-                            </Box>
-                            <Typography variant="body1" sx={{ fontWeight: 500, pl: 0 }}>
-                                {user.username || user.email.split('@')[0]}
-                            </Typography>
-                        </Grid>
-
-                        <Grid item xs={12} md={6}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                    Password
-                                </Typography>
-                            </Box>
-                            <Typography variant="body1" sx={{ fontWeight: 500, pl: 0 }}>
-                                ••••••••
-                            </Typography>
                         </Grid>
                     </Grid>
                 </Box>

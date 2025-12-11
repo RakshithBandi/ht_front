@@ -162,45 +162,143 @@ function Memories() {
     };
 
     return (
-        <Box sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+        <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1600, mx: 'auto' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                <Typography variant="h4" sx={{ fontWeight: 800 }}>
                     Memories
                 </Typography>
             </Box>
 
             {!isAuthorized && (
-                <Alert severity="info" sx={{ mb: 3 }}>
+                <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
                     You don't have permission to delete memories. Only authorized users can perform this action.
                 </Alert>
             )}
 
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs value={tabValue} onChange={handleTabChange} aria-label="memories tabs">
-                    <Tab icon={<ImageIcon />} label="Images" iconPosition="start" />
+            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+                <Tabs
+                    value={tabValue}
+                    onChange={handleTabChange}
+                    aria-label="memories tabs"
+                    sx={{
+                        '& .MuiTab-root': {
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            fontSize: '1rem',
+                            minHeight: 48,
+                            mr: 2,
+                        },
+                        '& .Mui-selected': {
+                            color: '#667eea !important',
+                        },
+                        '& .MuiTabs-indicator': {
+                            backgroundColor: '#667eea',
+                            height: 3,
+                            borderRadius: '3px 3px 0 0',
+                        }
+                    }}
+                >
+                    <Tab icon={<ImageIcon />} label="Gallery" iconPosition="start" />
                     <Tab icon={<VideoIcon />} label="Videos" iconPosition="start" />
                 </Tabs>
             </Box>
 
             {/* Images Tab */}
             <TabPanel value={tabValue} index={0}>
-                <Box sx={{ mb: 3 }}>
+                <Box sx={{ mb: 4, display: 'flex', justifyContent: 'flex-end' }}>
                     <Button
                         variant="contained"
                         startIcon={<UploadIcon />}
                         onClick={() => handleOpenDialog('image')}
                         sx={{
+                            borderRadius: 2,
+                            px: 3,
+                            py: 1,
                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            boxShadow: '0 4px 14px 0 rgba(118, 75, 162, 0.3)',
+                            '&:hover': {
+                                background: 'linear-gradient(135deg, #5568d3 0%, #63408a 100%)',
+                                transform: 'translateY(-1px)',
+                                boxShadow: '0 6px 20px 0 rgba(118, 75, 162, 0.4)',
+                            },
                         }}
                     >
                         Upload Image
                     </Button>
                 </Box>
 
-                <Grid container spacing={3}>
+                <Box sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                    gap: 3,
+                    animation: 'fadeIn 0.5s ease-in-out',
+                    '@keyframes fadeIn': {
+                        '0%': { opacity: 0, transform: 'translateY(20px)' },
+                        '100%': { opacity: 1, transform: 'translateY(0)' },
+                    }
+                }}>
                     {memories.images.map((memory) => (
-                        <Grid item xs={12} sm={6} md={4} key={memory.id}>
-                            <Card sx={{ position: 'relative', borderRadius: 2, minHeight: 300 }}>
+                        <Card
+                            key={memory.id}
+                            elevation={0}
+                            sx={{
+                                position: 'relative',
+                                borderRadius: 4,
+                                overflow: 'hidden',
+                                background: 'transparent',
+                                transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                '&:hover': {
+                                    transform: 'translateY(-4px)',
+                                    '& .memory-overlay': {
+                                        opacity: 1
+                                    },
+                                    '& .memory-img': {
+                                        transform: 'scale(1.05)'
+                                    }
+                                }
+                            }}
+                        >
+                            <Box sx={{ position: 'relative', pt: '75%', overflow: 'hidden', borderRadius: 4 }}>
+                                <CardMedia
+                                    component="img"
+                                    image={memory.file}
+                                    alt={memory.title}
+                                    className="memory-img"
+                                    sx={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'cover',
+                                        transition: 'transform 0.5s ease',
+                                    }}
+                                />
+                                <Box
+                                    className="memory-overlay"
+                                    sx={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        background: 'linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.7) 100%)',
+                                        opacity: 0.8,
+                                        transition: 'opacity 0.3s ease',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'flex-end',
+                                        p: 2
+                                    }}
+                                >
+                                    <Typography variant="subtitle1" sx={{ color: 'white', fontWeight: 600, textShadow: '0 2px 4px rgba(0,0,0,0.3)' }} noWrap>
+                                        {memory.title}
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                                        {new Date(memory.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                                    </Typography>
+                                </Box>
+
                                 {isAuthorized && (
                                     <IconButton
                                         size="small"
@@ -209,104 +307,114 @@ function Memories() {
                                             position: 'absolute',
                                             top: 8,
                                             right: 8,
-                                            bgcolor: 'rgba(0,0,0,0.5)',
+                                            bgcolor: 'rgba(255,255,255,0.2)',
                                             color: 'white',
-                                            '&:hover': { bgcolor: 'rgba(255,0,0,0.7)' }
+                                            backdropFilter: 'blur(4px)',
+                                            '&:hover': { bgcolor: 'rgba(244, 67, 54, 0.8)' }
                                         }}
                                     >
                                         <DeleteIcon fontSize="small" />
                                     </IconButton>
                                 )}
-                                <CardMedia
-                                    component="img"
-                                    height="250"
-                                    image={memory.file}
-                                    alt={memory.title}
-                                    sx={{ objectFit: 'cover' }}
-                                />
-                                <CardContent>
-                                    <Typography variant="subtitle1" noWrap>
-                                        {memory.title}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                        {new Date(memory.createdAt).toLocaleDateString()}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
+                            </Box>
+                        </Card>
                     ))}
                     {memories.images.length === 0 && (
-                        <Grid item xs={12}>
-                            <Typography variant="body1" color="text.secondary" align="center">
-                                No images uploaded yet.
+                        <Box sx={{ gridColumn: '1/-1', textAlign: 'center', py: 8 }}>
+                            <Typography variant="body1" color="text.secondary">
+                                No memories captured yet.
                             </Typography>
-                        </Grid>
+                        </Box>
                     )}
-                </Grid>
+                </Box>
             </TabPanel>
 
             {/* Videos Tab */}
             <TabPanel value={tabValue} index={1}>
-                <Box sx={{ mb: 3 }}>
+                <Box sx={{ mb: 4, display: 'flex', justifyContent: 'flex-end' }}>
                     <Button
                         variant="contained"
                         startIcon={<UploadIcon />}
                         onClick={() => handleOpenDialog('video')}
                         sx={{
+                            borderRadius: 2,
+                            px: 3,
+                            py: 1,
                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            boxShadow: '0 4px 14px 0 rgba(118, 75, 162, 0.3)',
+                            '&:hover': {
+                                background: 'linear-gradient(135deg, #5568d3 0%, #63408a 100%)',
+                                transform: 'translateY(-1px)',
+                                boxShadow: '0 6px 20px 0 rgba(118, 75, 162, 0.4)',
+                            },
                         }}
                     >
                         Upload Video
                     </Button>
                 </Box>
 
-                <Grid container spacing={3}>
+                <Box sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                    gap: 3
+                }}>
                     {memories.videos.map((memory) => (
-                        <Grid item xs={12} sm={6} md={4} key={memory.id}>
-                            <Card sx={{ position: 'relative', borderRadius: 2, minHeight: 300 }}>
-                                {isAuthorized && (
-                                    <IconButton
-                                        size="small"
-                                        onClick={() => handleDelete(memory.id, 'video')}
-                                        sx={{
-                                            position: 'absolute',
-                                            top: 8,
-                                            right: 8,
-                                            zIndex: 1,
-                                            bgcolor: 'rgba(0,0,0,0.5)',
-                                            color: 'white',
-                                            '&:hover': { bgcolor: 'rgba(255,0,0,0.7)' }
-                                        }}
-                                    >
-                                        <DeleteIcon fontSize="small" />
-                                    </IconButton>
-                                )}
-                                <CardMedia
-                                    component="video"
-                                    height="250"
-                                    src={memory.file}
-                                    controls
-                                    sx={{ objectFit: 'cover', bgcolor: 'black' }}
-                                />
-                                <CardContent>
-                                    <Typography variant="subtitle1" noWrap>
-                                        {memory.title}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                        {new Date(memory.createdAt).toLocaleDateString()}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
+                        <Card
+                            key={memory.id}
+                            elevation={0}
+                            sx={{
+                                position: 'relative',
+                                borderRadius: 4,
+                                overflow: 'hidden',
+                                background: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : '#fff',
+                                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                                border: '1px solid',
+                                borderColor: theme.palette.divider
+                            }}
+                        >
+                            {isAuthorized && (
+                                <IconButton
+                                    size="small"
+                                    onClick={() => handleDelete(memory.id, 'video')}
+                                    sx={{
+                                        position: 'absolute',
+                                        top: 8,
+                                        right: 8,
+                                        zIndex: 2,
+                                        bgcolor: 'rgba(0,0,0,0.5)',
+                                        color: 'white',
+                                        '&:hover': { bgcolor: 'rgba(244, 67, 54, 0.8)' }
+                                    }}
+                                >
+                                    <DeleteIcon fontSize="small" />
+                                </IconButton>
+                            )}
+                            <CardMedia
+                                component="video"
+                                height="220"
+                                src={memory.file}
+                                controls
+                                sx={{ objectFit: 'cover', bgcolor: '#000' }}
+                            />
+                            <CardContent sx={{ p: 2 }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }} noWrap>
+                                    {memory.title}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <VideoIcon sx={{ fontSize: 14 }} />
+                                    {new Date(memory.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                                </Typography>
+                            </CardContent>
+                        </Card>
                     ))}
                     {memories.videos.length === 0 && (
-                        <Grid item xs={12}>
-                            <Typography variant="body1" color="text.secondary" align="center">
+                        <Box sx={{ gridColumn: '1/-1', textAlign: 'center', py: 8 }}>
+                            <Typography variant="body1" color="text.secondary">
                                 No videos uploaded yet.
                             </Typography>
-                        </Grid>
+                        </Box>
                     )}
-                </Grid>
+                </Box>
             </TabPanel>
 
             {/* Upload Dialog */}

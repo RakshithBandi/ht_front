@@ -3,7 +3,7 @@ const API_URL = `${API_BASE_URL}/api/notifications`;
 
 const notificationsAPI = {
     getAll: async () => {
-        const response = await fetch(`${API_BASE_URL}/`, {
+        const response = await fetch(`${API_URL}/`, {
             credentials: 'include'
         });
         if (!response.ok) {
@@ -14,7 +14,7 @@ const notificationsAPI = {
     },
 
     markAsRead: async (id) => {
-        const response = await fetch(`${API_BASE_URL}/${id}/mark_read/`, {
+        const response = await fetch(`${API_URL}/${id}/mark_read/`, {
             method: 'POST',
             credentials: 'include'
         });
@@ -26,7 +26,7 @@ const notificationsAPI = {
     },
 
     markAllAsRead: async () => {
-        const response = await fetch(`${API_BASE_URL}/mark_all_read/`, {
+        const response = await fetch(`${API_URL}/mark_all_read/`, {
             method: 'POST',
             credentials: 'include'
         });
@@ -38,7 +38,7 @@ const notificationsAPI = {
     },
 
     delete: async (id) => {
-        const response = await fetch(`${API_BASE_URL}/${id}/`, {
+        const response = await fetch(`${API_URL}/${id}/`, {
             method: 'DELETE',
             credentials: 'include'
         });
@@ -49,7 +49,7 @@ const notificationsAPI = {
     },
 
     clearAll: async () => {
-        const response = await fetch(`${API_BASE_URL}/clear_all/`, {
+        const response = await fetch(`${API_URL}/clear_all/`, {
             method: 'DELETE',
             credentials: 'include'
         });

@@ -3,7 +3,7 @@ const API_URL = `${API_BASE_URL}/api`;
 
 const memoriesAPI = {
     getAll: async () => {
-        const response = await fetch(`${API_BASE_URL}/memories/`, {
+        const response = await fetch(`${API_URL}/memories/`, {
             credentials: 'include'
         });
         if (!response.ok) throw new Error('Failed to fetch memories');
@@ -11,7 +11,7 @@ const memoriesAPI = {
     },
 
     create: async (memoryData) => {
-        const response = await fetch(`${API_BASE_URL}/memories/`, {
+        const response = await fetch(`${API_URL}/memories/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -25,7 +25,7 @@ const memoriesAPI = {
     },
 
     update: async (id, memoryData) => {
-        const response = await fetch(`${API_BASE_URL}/memories/${id}/`, {
+        const response = await fetch(`${API_URL}/memories/${id}/`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -39,7 +39,7 @@ const memoriesAPI = {
     },
 
     delete: async (id) => {
-        const response = await fetch(`${API_BASE_URL}/memories/${id}/`, {
+        const response = await fetch(`${API_URL}/memories/${id}/`, {
             method: 'DELETE',
             credentials: 'include'
         });

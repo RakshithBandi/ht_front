@@ -158,9 +158,9 @@ function PermanentMembers() {
     };
 
     return (
-        <Box sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+        <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1600, mx: 'auto' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                <Typography variant="h4" sx={{ fontWeight: 800 }}>
                     Permanent Members
                 </Typography>
                 {isAuthorized && (
@@ -169,44 +169,88 @@ function PermanentMembers() {
                         startIcon={<AddIcon />}
                         onClick={handleOpenDialog}
                         sx={{
+                            borderRadius: 2,
+                            px: 3,
+                            py: 1,
                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            boxShadow: '0 4px 14px 0 rgba(118, 75, 162, 0.3)',
                             '&:hover': {
                                 background: 'linear-gradient(135deg, #5568d3 0%, #63408a 100%)',
+                                transform: 'translateY(-1px)',
+                                boxShadow: '0 6px 20px 0 rgba(118, 75, 162, 0.4)',
                             },
                         }}
                     >
-                        Add Permanent Member
+                        Add Member
                     </Button>
                 )}
             </Box>
 
             {!isAuthorized && (
-                <Alert severity="info" sx={{ mb: 3 }}>
+                <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
                     You don't have permission to add, edit, or delete members. Only authorized users can perform these actions.
                 </Alert>
             )}
 
-            {/* Members Grid */}
-            <Grid container spacing={3}>
+            {/* Members Grid - Fixed Grid Syntax */}
+            <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                gap: 3,
+                animation: 'fadeIn 0.5s ease-in-out',
+                '@keyframes fadeIn': {
+                    '0%': { opacity: 0, transform: 'translateY(20px)' },
+                    '100%': { opacity: 1, transform: 'translateY(0)' },
+                }
+            }}>
                 {members.map((member) => (
-                    <Grid item xs={12} sm={6} md={4} key={member.id}>
-                        <Card
-                            sx={{
-                                minHeight: 400, // Increased height
-                                borderRadius: 3,
-                                position: 'relative',
+                    <Card
+                        key={member.id}
+                        elevation={0}
+                        sx={{
+                            height: '100%',
+                            minHeight: 400,
+                            borderRadius: 4,
+                            position: 'relative',
+                            background: theme.palette.mode === 'dark' 
+                                ? 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'
+                                : '#ffffff',
+                            border: '1px solid',
+                            borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-8px)',
                                 boxShadow: theme.palette.mode === 'dark'
-                                    ? '0 4px 12px rgba(0,0,0,0.3)'
-                                    : '0 4px 12px rgba(0,0,0,0.1)',
-                                transition: 'transform 0.2s',
-                                '&:hover': {
-                                    transform: 'translateY(-4px)',
-                                },
-                            }}
-                        >
-                            <CardContent>
+                                    ? '0 20px 40px rgba(0,0,0,0.4)'
+                                    : '0 20px 40px rgba(0,0,0,0.1)',
+                                '& .member-actions': {
+                                    opacity: 1,
+                                    transform: 'translateY(0)',
+                                }
+                            },
+                            overflow: 'visible',
+                        }}
+                    >
+                        <CardContent sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            {/* Header Background */}
+                            <Box sx={{
+                                height: 100,
+                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                borderRadius: '16px 16px 0 0',
+                                position: 'relative',
+                                mb: 6
+                            }}>
                                 {/* Profile Picture */}
-                                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                                <Box sx={{
+                                    position: 'absolute',
+                                    bottom: -40,
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    p: 0.5,
+                                    bgcolor: theme.palette.background.paper,
+                                    borderRadius: '50%',
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+                                }}>
                                     <Avatar
                                         src={member.profilePic}
                                         alt={member.name}
@@ -224,70 +268,111 @@ function PermanentMembers() {
                                     </Avatar>
                                 </Box>
 
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 600, textAlign: 'center', width: '100%' }}>
-                                        {member.name}
-                                    </Typography>
-                                    {isAuthorized && (
-                                        <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => handleEdit(member)}
-                                                sx={{ color: theme.palette.primary.main }}
-                                            >
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => handleDelete(member.id)}
-                                                sx={{ color: theme.palette.error.main }}
-                                            >
-                                                <DeleteIcon fontSize="small" />
-                                            </IconButton>
-                                        </Box>
-                                    )}
+                                {isAuthorized && (
+                                    <Box 
+                                        className="member-actions"
+                                        sx={{ 
+                                            position: 'absolute', 
+                                            top: 8, 
+                                            right: 8,
+                                            opacity: 0,
+                                            transition: 'all 0.3s ease',
+                                            transform: 'translateY(-10px)',
+                                            display: 'flex',
+                                            gap: 1
+                                        }}
+                                    >
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => handleEdit(member)}
+                                            sx={{ 
+                                                bgcolor: 'rgba(255,255,255,0.2)', 
+                                                color: '#fff',
+                                                '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
+                                            }}
+                                        >
+                                            <EditIcon fontSize="small" />
+                                        </IconButton>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => handleDelete(member.id)}
+                                            sx={{ 
+                                                bgcolor: 'rgba(255,0,0,0.2)', 
+                                                color: '#fff',
+                                                '&:hover': { bgcolor: 'rgba(255,0,0,0.4)' }
+                                            }}
+                                        >
+                                            <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                    </Box>
+                                )}
+                            </Box>
+
+                            <Box sx={{ px: 3, pb: 4, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                <Typography variant="h6" sx={{ fontWeight: 700, textAlign: 'center', mb: 0.5 }}>
+                                    {member.name}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 3 }}>
+                                    Age: {member.age}
+                                </Typography>
+
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
+                                    <Box sx={{ 
+                                        p: 2, 
+                                        borderRadius: 3, 
+                                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                                        border: '1px solid',
+                                        borderColor: theme.palette.divider 
+                                    }}>
+                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                                            Invested Amount
+                                        </Typography>
+                                        <Typography variant="h6" sx={{ fontWeight: 600, color: '#667eea' }}>
+                                            ₹{member.amountInvested.toLocaleString()}
+                                        </Typography>
+                                    </Box>
+
+                                    <Box sx={{ 
+                                        p: 2, 
+                                        borderRadius: 3, 
+                                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                                        border: '1px solid',
+                                        borderColor: theme.palette.divider 
+                                    }}>
+                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                                            Paid This Year
+                                        </Typography>
+                                        <Typography variant="h6" sx={{ fontWeight: 600, color: '#764ba2' }}>
+                                            ₹{member.amountPaidThisYear.toLocaleString()}
+                                        </Typography>
+                                    </Box>
                                 </Box>
 
-                                <Divider sx={{ mb: 2 }} />
+                                <Divider sx={{ my: 3 }} />
 
-                                <Box sx={{ mb: 1 }}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Age: <strong>{member.age}</strong>
+                                <Box sx={{
+                                    p: 2.5,
+                                    borderRadius: 3,
+                                    background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+                                    textAlign: 'center'
+                                }}>
+                                    <Typography variant="caption" sx={{ color: '#764ba2', fontWeight: 600, display: 'block', mb: 0.5 }}>
+                                        TOTAL CONTRIBUTION
+                                    </Typography>
+                                    <Typography variant="h5" sx={{ 
+                                        fontWeight: 800, 
+                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent'
+                                    }}>
+                                        ₹{calculateTotal(member).toLocaleString()}
                                     </Typography>
                                 </Box>
-
-                                <Box sx={{ mb: 1 }}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Amount Invested: <strong>₹{member.amountInvested.toLocaleString()}</strong>
-                                    </Typography>
-                                </Box>
-
-                                <Box sx={{ mb: 2 }}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Amount Paid This Year: <strong>₹{member.amountPaidThisYear.toLocaleString()}</strong>
-                                    </Typography>
-                                </Box>
-
-                                <Divider sx={{ mb: 2 }} />
-
-                                <Box
-                                    sx={{
-                                        p: 2,
-                                        borderRadius: 2,
-                                        background: theme.palette.mode === 'dark'
-                                            ? 'rgba(102, 126, 234, 0.15)'
-                                            : 'rgba(102, 126, 234, 0.1)',
-                                    }}
-                                >
-                                    <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 700 }}>
-                                        Total Amount: ₹{calculateTotal(member).toLocaleString()}
-                                    </Typography>
-                                </Box>
-                            </CardContent>
-                        </Card>
-                    </Grid>
+                            </Box>
+                        </CardContent>
+                    </Card>
                 ))}
-            </Grid>
+            </Box>
 
             {members.length === 0 && (
                 <Box sx={{ textAlign: 'center', py: 8 }}>

@@ -32,16 +32,32 @@ function LanguageSettings() {
             <Paper
                 elevation={0}
                 sx={{
-                    p: 3,
-                    borderRadius: 3,
-                    border: `1px solid ${theme.palette.divider}`,
+                    p: { xs: 3, md: 5 },
+                    borderRadius: 4,
+                    border: '1px solid',
+                    borderColor: theme.palette.divider,
+                    background: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : '#fff',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
                 }}
             >
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                    <LanguageIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        Select Application Language
-                    </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
+                    <Box sx={{
+                        p: 1.5,
+                        borderRadius: 2,
+                        bgcolor: 'rgba(102, 126, 234, 0.1)',
+                        color: theme.palette.primary.main,
+                        mr: 2
+                    }}>
+                        <LanguageIcon fontSize="medium" />
+                    </Box>
+                    <Box>
+                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                            Select Application Language
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Choose the language you want to see throughout the application
+                        </Typography>
+                    </Box>
                 </Box>
 
                 <FormControl component="fieldset" sx={{ width: '100%' }}>
@@ -51,39 +67,50 @@ function LanguageSettings() {
                         value={language}
                         onChange={handleLanguageChange}
                     >
-                        <Grid container spacing={2}>
+                        <Grid container spacing={3}>
                             {languages.map((lang) => (
                                 <Grid item xs={12} sm={6} key={lang.code}>
                                     <Card
-                                        variant="outlined"
+                                        elevation={0}
                                         sx={{
                                             position: 'relative',
-                                            borderColor: language === lang.code ? theme.palette.primary.main : theme.palette.divider,
+                                            cursor: 'pointer',
+                                            border: '2px solid',
+                                            borderColor: language === lang.code ? '#667eea' : theme.palette.divider,
+                                            borderRadius: 3,
                                             bgcolor: language === lang.code
-                                                ? (theme.palette.mode === 'dark' ? 'rgba(102, 126, 234, 0.1)' : 'rgba(102, 126, 234, 0.05)')
+                                                ? (theme.palette.mode === 'dark' ? 'rgba(102, 126, 234, 0.1)' : 'rgba(102, 126, 234, 0.04)')
                                                 : 'transparent',
-                                            transition: 'all 0.2s',
+                                            transition: 'all 0.2s ease-in-out',
+                                            transform: language === lang.code ? 'scale(1.02)' : 'scale(1)',
+                                            boxShadow: language === lang.code ? '0 8px 20px rgba(102, 126, 234, 0.15)' : 'none',
                                             '&:hover': {
-                                                borderColor: theme.palette.primary.main,
+                                                borderColor: '#667eea',
                                                 bgcolor: theme.palette.mode === 'dark' ? 'rgba(102, 126, 234, 0.05)' : 'rgba(102, 126, 234, 0.02)',
+                                                transform: 'translateY(-4px)',
+                                                boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
                                             }
                                         }}
+                                        onClick={() => changeLanguage(lang.code)}
                                     >
-                                        <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                                        <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
                                             <FormControlLabel
                                                 value={lang.code}
-                                                control={<Radio />}
+                                                control={<Radio sx={{
+                                                    color: language === lang.code ? '#667eea' : 'text.disabled',
+                                                    '&.Mui-checked': { color: '#667eea' }
+                                                }} />}
                                                 label={
-                                                    <Box>
-                                                        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                                    <Box sx={{ ml: 1 }}>
+                                                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
                                                             {lang.nativeName}
                                                         </Typography>
-                                                        <Typography variant="body2" color="text.secondary">
+                                                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                                                             {lang.name}
                                                         </Typography>
                                                     </Box>
                                                 }
-                                                sx={{ width: '100%', m: 0 }}
+                                                sx={{ width: '100%', m: 0, pointerEvents: 'none' }}
                                             />
                                         </CardContent>
                                     </Card>

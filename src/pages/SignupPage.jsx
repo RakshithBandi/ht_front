@@ -143,17 +143,45 @@ function SignupPage() {
                 position: 'relative',
                 overflow: 'hidden',
                 py: 4,
-                background: '#f5f5f5' // Light background for better contrast
+                background: 'linear-gradient(135deg, #1a202c 0%, #2d3748 100%)',
+                '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: -100,
+                    right: -100,
+                    width: 400,
+                    height: 400,
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', // Different gradient for variety
+                    filter: 'blur(100px)',
+                    opacity: 0.5,
+                    zIndex: 0
+                },
+                '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    bottom: -100,
+                    left: -100,
+                    width: 300,
+                    height: 300,
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    filter: 'blur(100px)',
+                    opacity: 0.4,
+                    zIndex: 0
+                }
             }}
         >
-            <Container maxWidth="sm">
+            <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
                 <Paper
                     elevation={24}
                     sx={{
-                        p: 5,
+                        p: { xs: 3, md: 5 },
                         borderRadius: 4,
-                        position: 'relative',
-                        zIndex: 1,
+                        background: 'rgba(255, 255, 255, 0.9)',
+                        backdropFilter: 'blur(20px)',
+                        boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+                        border: '1px solid rgba(255, 255, 255, 0.18)',
                     }}
                 >
                     <Box sx={{ textAlign: 'center', mb: 4 }}>

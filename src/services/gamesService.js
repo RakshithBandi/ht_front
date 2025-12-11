@@ -3,7 +3,7 @@ const API_URL = `${API_BASE_URL}/api`;
 
 const gamesAPI = {
     getAll: async () => {
-        const response = await fetch(`${API_BASE_URL}/games/`, {
+        const response = await fetch(`${API_URL}/games/`, {
             credentials: 'include'
         });
         if (!response.ok) throw new Error('Failed to fetch games');
@@ -11,7 +11,7 @@ const gamesAPI = {
     },
 
     create: async (gameData) => {
-        const response = await fetch(`${API_BASE_URL}/games/`, {
+        const response = await fetch(`${API_URL}/games/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -25,7 +25,7 @@ const gamesAPI = {
     },
 
     update: async (id, gameData) => {
-        const response = await fetch(`${API_BASE_URL}/games/${id}/`, {
+        const response = await fetch(`${API_URL}/games/${id}/`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -39,7 +39,7 @@ const gamesAPI = {
     },
 
     delete: async (id) => {
-        const response = await fetch(`${API_BASE_URL}/games/${id}/`, {
+        const response = await fetch(`${API_URL}/games/${id}/`, {
             method: 'DELETE',
             credentials: 'include'
         });

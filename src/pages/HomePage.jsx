@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Box,
     AppBar,
@@ -17,6 +17,7 @@ import {
     Avatar,
     Menu,
     MenuItem,
+    Badge,
 } from '@mui/material';
 import {
     Menu as MenuIcon,
@@ -34,10 +35,12 @@ import {
     PhotoLibrary,
     Dashboard as DashboardIcon,
     AccountBalanceWallet,
+    EmojiEvents,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import Members from '../sidebar/Members';
 import SettingsMenu from '../sidebar/SettingsMenu';
+import notificationsAPI from '../services/notificationsService';
 
 const drawerWidth = 260;
 
@@ -48,9 +51,51 @@ function HomePage({ toggleTheme, isDarkMode, children }) {
     const navigate = useNavigate();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
+    const [notifications, setNotifications] = useState([]);
+    const [lastNotificationCount, setLastNotificationCount] = useState(0);
     const { t } = useLanguage();
 
     const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    // Fetch notifications
+    const fetchNotifications = async () => {
+        try {
+            const data = await notificationsAPI.getAll();
+            setNotifications(data);
+
+            // Check for new notifications and show browser notification
+            const unreadCount = data.filter(n => !n.is_read).length;
+            if (unreadCount > lastNotificationCount && lastNotificationCount > 0) {
+                const newNotifications = data.filter(n => !n.is_read).slice(0, unreadCount - lastNotificationCount);
+
+                // Show browser notification if enabled
+                const notificationsEnabled = localStorage.getItem('notificationsEnabled') === 'true';
+                if (notificationsEnabled && 'Notification' in window && Notification.permission === 'granted') {
+                    newNotifications.forEach(notification => {
+                        new Notification(notification.title, {
+                            body: notification.body,
+                            icon: '/favicon.ico',
+                            tag: `notification-${notification.id}`,
+                        });
+                    });
+                }
+            }
+            setLastNotificationCount(unreadCount);
+        } catch (error) {
+            console.error('Failed to fetch notifications:', error);
+        }
+    };
+
+    // Poll for notifications every 30 seconds
+    useEffect(() => {
+        fetchNotifications(); // Initial fetch
+
+        const interval = setInterval(() => {
+            fetchNotifications();
+        }, 30000); // 30 seconds
+
+        return () => clearInterval(interval); // Cleanup on unmount
+    }, [lastNotificationCount]);
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -250,6 +295,29 @@ function HomePage({ toggleTheme, isDarkMode, children }) {
                         />
                     </ListItemButton>
                 </ListItem>
+                <ListItem disablePadding sx={{ mb: 0.5 }}>
+                    <ListItemButton
+                        onClick={() => navigate('/quiz')}
+                        sx={{
+                            borderRadius: 2,
+                            '&:hover': {
+                                backgroundColor: theme.palette.mode === 'dark'
+                                    ? 'rgba(102, 126, 234, 0.15)'
+                                    : 'rgba(102, 126, 234, 0.1)',
+                            },
+                        }}
+                    >
+                        <ListItemIcon sx={{ color: theme.palette.primary.main, minWidth: 40 }}>
+                            <EmojiEvents />
+                        </ListItemIcon>
+                        <ListItemText
+                            primary="Quiz"
+                            primaryTypographyProps={{
+                                fontWeight: 500,
+                            }}
+                        />
+                    </ListItemButton>
+                </ListItem>
 
                 {/* Settings Component with Submenu */}
                 <SettingsMenu />
@@ -301,6 +369,20 @@ function HomePage({ toggleTheme, isDarkMode, children }) {
 
                     <IconButton onClick={toggleTheme} color="inherit" sx={{ mr: 1 }}>
                         {isDarkMode ? <Brightness7 /> : <Brightness4 />}
+                    </IconButton>
+
+                    <IconButton
+                        onClick={() => navigate('/settings/notifications')}
+                        color="inherit"
+                        sx={{ mr: 1 }}
+                    >
+                        <Badge
+                            badgeContent={notifications.filter(n => !n.is_read).length}
+                            color="error"
+                            max={99}
+                        >
+                            <Notifications />
+                        </Badge>
                     </IconButton>
 
                     <IconButton

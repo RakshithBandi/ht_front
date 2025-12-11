@@ -27,6 +27,7 @@ import {
     Delete,
     Add,
     Logout,
+    People,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
@@ -108,102 +109,143 @@ function Users() {
                 </Button>
             </Box>
 
-            <TableContainer
-                component={Paper}
+            <Paper
                 elevation={0}
                 sx={{
-                    borderRadius: 2,
-                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: 4,
+                    overflow: 'hidden',
+                    border: '1px solid',
+                    borderColor: theme.palette.divider,
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
                 }}
             >
-                <Table>
-                    <TableHead>
-                        <TableRow sx={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgba(102, 126, 234, 0.1)' : 'rgba(102, 126, 234, 0.05)' }}>
-                            <TableCell sx={{ fontWeight: 700 }}>User</TableCell>
-                            <TableCell sx={{ fontWeight: 700 }}>Email</TableCell>
-                            <TableCell sx={{ fontWeight: 700 }}>Phone</TableCell>
-                            <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
-                            <TableCell sx={{ fontWeight: 700 }} align="right">Actions</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {users.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
-                                    <Typography variant="body1" color="text.secondary">
-                                        No users found. Please sign up to create users.
-                                    </Typography>
-                                </TableCell>
+                <TableContainer>
+                    <Table>
+                        <TableHead>
+                            <TableRow sx={{
+                                background: 'linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%)',
+                                ...(theme.palette.mode === 'dark' && {
+                                    background: 'linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'
+                                })
+                            }}>
+                                <TableCell sx={{ fontWeight: 700, py: 2, color: 'text.secondary', borderBottom: `2px solid ${theme.palette.divider}` }}>User</TableCell>
+                                <TableCell sx={{ fontWeight: 700, py: 2, color: 'text.secondary', borderBottom: `2px solid ${theme.palette.divider}` }}>Email</TableCell>
+                                <TableCell sx={{ fontWeight: 700, py: 2, color: 'text.secondary', borderBottom: `2px solid ${theme.palette.divider}` }}>Phone</TableCell>
+                                <TableCell sx={{ fontWeight: 700, py: 2, color: 'text.secondary', borderBottom: `2px solid ${theme.palette.divider}` }}>Status</TableCell>
+                                <TableCell sx={{ fontWeight: 700, py: 2, color: 'text.secondary', borderBottom: `2px solid ${theme.palette.divider}` }} align="right">Actions</TableCell>
                             </TableRow>
-                        ) : (
-                            users.map((user, index) => (
-                                <TableRow
-                                    key={index}
-                                    sx={{
-                                        '&:hover': {
-                                            backgroundColor: theme.palette.mode === 'dark'
-                                                ? 'rgba(102, 126, 234, 0.05)'
-                                                : 'rgba(102, 126, 234, 0.02)',
-                                        },
-                                    }}
-                                >
-                                    <TableCell>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                            <Avatar
-                                                sx={{
-                                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                                    fontWeight: 600,
-                                                }}
-                                            >
-                                                {getInitials(user.fullName)}
-                                            </Avatar>
-                                            <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                                {user.fullName}
+                        </TableHead>
+                        <TableBody>
+                            {users.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} align="center" sx={{ py: 8 }}>
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                            <Box sx={{ p: 2, borderRadius: '50%', bgcolor: 'rgba(0,0,0,0.02)', mb: 2 }}>
+                                                <People sx={{ fontSize: 40, color: 'text.secondary', opacity: 0.5 }} />
+                                            </Box>
+                                            <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
+                                                No users found
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary">
+                                                New updates will appear here
                                             </Typography>
                                         </Box>
                                     </TableCell>
-                                    <TableCell>{user.email}</TableCell>
-                                    <TableCell>{user.phone || 'N/A'}</TableCell>
-                                    <TableCell>
-                                        <Chip
-                                            label="Active"
-                                            size="small"
-                                            sx={{
-                                                backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                                                color: '#4caf50',
-                                                fontWeight: 600,
-                                            }}
-                                        />
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => handleViewUser(user)}
-                                            sx={{ color: theme.palette.primary.main }}
-                                        >
-                                            <Visibility fontSize="small" />
-                                        </IconButton>
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => handleEditUser(user)}
-                                            sx={{ color: theme.palette.info.main }}
-                                        >
-                                            <Edit fontSize="small" />
-                                        </IconButton>
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => handleDeleteUser(user.email)}
-                                            sx={{ color: theme.palette.error.main }}
-                                        >
-                                            <Delete fontSize="small" />
-                                        </IconButton>
-                                    </TableCell>
                                 </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                            ) : (
+                                users.map((user, index) => (
+                                    <TableRow
+                                        key={index}
+                                        hover
+                                        sx={{
+                                            '&:last-child td, &:last-child th': { border: 0 },
+                                            transition: 'all 0.2s',
+                                            '&:hover': {
+                                                backgroundColor: theme.palette.mode === 'dark'
+                                                    ? 'rgba(255,255,255,0.03)'
+                                                    : 'rgba(0,0,0,0.01)',
+                                                transform: 'translateY(-1px)',
+                                                boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+                                            },
+                                        }}
+                                    >
+                                        <TableCell sx={{ py: 2 }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                <Avatar
+                                                    sx={{
+                                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                                        fontWeight: 700,
+                                                        width: 40,
+                                                        height: 40,
+                                                        boxShadow: '0 2px 8px rgba(118, 75, 162, 0.3)'
+                                                    }}
+                                                >
+                                                    {getInitials(user.fullName)}
+                                                </Avatar>
+                                                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                                    {user.fullName}
+                                                </Typography>
+                                            </Box>
+                                        </TableCell>
+                                        <TableCell sx={{ color: 'text.secondary' }}>{user.email}</TableCell>
+                                        <TableCell sx={{ color: 'text.secondary' }}>{user.phone || 'N/A'}</TableCell>
+                                        <TableCell>
+                                            <Chip
+                                                label="Active"
+                                                size="small"
+                                                variant="outlined"
+                                                color="success"
+                                                sx={{
+                                                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                                                    borderColor: 'rgba(76, 175, 80, 0.2)',
+                                                    fontWeight: 600,
+                                                }}
+                                            />
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => handleViewUser(user)}
+                                                    sx={{
+                                                        color: theme.palette.primary.main,
+                                                        bgcolor: 'rgba(25, 118, 210, 0.05)',
+                                                        '&:hover': { bgcolor: 'rgba(25, 118, 210, 0.15)' }
+                                                    }}
+                                                >
+                                                    <Visibility fontSize="small" />
+                                                </IconButton>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => handleEditUser(user)}
+                                                    sx={{
+                                                        color: theme.palette.info.main,
+                                                        bgcolor: 'rgba(2, 136, 209, 0.05)',
+                                                        '&:hover': { bgcolor: 'rgba(2, 136, 209, 0.15)' }
+                                                    }}
+                                                >
+                                                    <Edit fontSize="small" />
+                                                </IconButton>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => handleDeleteUser(user.email)}
+                                                    sx={{
+                                                        color: theme.palette.error.main,
+                                                        bgcolor: 'rgba(211, 47, 47, 0.05)',
+                                                        '&:hover': { bgcolor: 'rgba(211, 47, 47, 0.15)' }
+                                                    }}
+                                                >
+                                                    <Delete fontSize="small" />
+                                                </IconButton>
+                                            </Box>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Paper>
 
             {/* User Details Dialog */}
             <Dialog

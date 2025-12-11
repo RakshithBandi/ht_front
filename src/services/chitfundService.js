@@ -3,7 +3,7 @@ const API_URL = `${API_BASE_URL}/api`;
 
 const chitfundAPI = {
     getAll: async () => {
-        const response = await fetch(`${API_BASE_URL}/chitfund/`, {
+        const response = await fetch(`${API_URL}/chitfund/`, {
             credentials: 'include'
         });
         if (!response.ok) throw new Error('Failed to fetch chitfund data');
@@ -11,7 +11,7 @@ const chitfundAPI = {
     },
 
     create: async (chitfundData) => {
-        const response = await fetch(`${API_BASE_URL}/chitfund/`, {
+        const response = await fetch(`${API_URL}/chitfund/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -25,7 +25,7 @@ const chitfundAPI = {
     },
 
     update: async (id, chitfundData) => {
-        const response = await fetch(`${API_BASE_URL}/chitfund/${id}/`, {
+        const response = await fetch(`${API_URL}/chitfund/${id}/`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -39,7 +39,7 @@ const chitfundAPI = {
     },
 
     delete: async (id) => {
-        const response = await fetch(`${API_BASE_URL}/chitfund/${id}/`, {
+        const response = await fetch(`${API_URL}/chitfund/${id}/`, {
             method: 'DELETE',
             credentials: 'include'
         });

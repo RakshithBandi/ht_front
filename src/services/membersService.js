@@ -4,14 +4,14 @@ const API_URL = `${API_BASE_URL}/api`;
 const membersAPI = {
     permanent: {
         getAll: async () => {
-            const response = await fetch(`${API_BASE_URL}/members/permanent/`, {
+            const response = await fetch(`${API_URL}/members/permanent/`, {
                 credentials: 'include'
             });
             if (!response.ok) throw new Error('Failed to fetch permanent members');
             return response.json();
         },
         create: async (memberData) => {
-            const response = await fetch(`${API_BASE_URL}/members/permanent/`, {
+            const response = await fetch(`${API_URL}/members/permanent/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -24,7 +24,7 @@ const membersAPI = {
             return response.json();
         },
         update: async (id, memberData) => {
-            const response = await fetch(`${API_BASE_URL}/members/permanent/${id}/`, {
+            const response = await fetch(`${API_URL}/members/permanent/${id}/`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -37,7 +37,7 @@ const membersAPI = {
             return response.json();
         },
         delete: async (id) => {
-            const response = await fetch(`${API_BASE_URL}/members/permanent/${id}/`, {
+            const response = await fetch(`${API_URL}/members/permanent/${id}/`, {
                 method: 'DELETE',
                 credentials: 'include'
             });
@@ -47,14 +47,14 @@ const membersAPI = {
 
     temporary: {
         getAll: async () => {
-            const response = await fetch(`${API_BASE_URL}/members/temporary/`, {
+            const response = await fetch(`${API_URL}/members/temporary/`, {
                 credentials: 'include'
             });
             if (!response.ok) throw new Error('Failed to fetch temporary members');
             return response.json();
         },
         create: async (memberData) => {
-            const response = await fetch(`${API_BASE_URL}/members/temporary/`, {
+            const response = await fetch(`${API_URL}/members/temporary/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -67,7 +67,7 @@ const membersAPI = {
             return response.json();
         },
         update: async (id, memberData) => {
-            const response = await fetch(`${API_BASE_URL}/members/temporary/${id}/`, {
+            const response = await fetch(`${API_URL}/members/temporary/${id}/`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -80,7 +80,7 @@ const membersAPI = {
             return response.json();
         },
         delete: async (id) => {
-            const response = await fetch(`${API_BASE_URL}/members/temporary/${id}/`, {
+            const response = await fetch(`${API_URL}/members/temporary/${id}/`, {
                 method: 'DELETE',
                 credentials: 'include'
             });
@@ -90,14 +90,14 @@ const membersAPI = {
 
     junior: {
         getAll: async () => {
-            const response = await fetch(`${API_BASE_URL}/members/junior/`, {
+            const response = await fetch(`${API_URL}/members/junior/`, {
                 credentials: 'include'
             });
             if (!response.ok) throw new Error('Failed to fetch junior members');
             return response.json();
         },
         create: async (memberData) => {
-            const response = await fetch(`${API_BASE_URL}/members/junior/`, {
+            const response = await fetch(`${API_URL}/members/junior/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -110,7 +110,7 @@ const membersAPI = {
             return response.json();
         },
         update: async (id, memberData) => {
-            const response = await fetch(`${API_BASE_URL}/members/junior/${id}/`, {
+            const response = await fetch(`${API_URL}/members/junior/${id}/`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -123,7 +123,7 @@ const membersAPI = {
             return response.json();
         },
         delete: async (id) => {
-            const response = await fetch(`${API_BASE_URL}/members/junior/${id}/`, {
+            const response = await fetch(`${API_URL}/members/junior/${id}/`, {
                 method: 'DELETE',
                 credentials: 'include'
             });

@@ -82,6 +82,15 @@ function NotificationsPage() {
         }
     };
 
+    const handleMarkAsRead = async (id) => {
+        try {
+            await notificationsAPI.markAsRead(id);
+            await loadNotifications();
+        } catch (error) {
+            console.error('Failed to mark notification as read:', error);
+        }
+    };
+
     const handleDeleteNotification = async (id) => {
         try {
             await notificationsAPI.delete(id);
@@ -138,31 +147,26 @@ function NotificationsPage() {
                 elevation={0}
                 sx={{
                     p: 3,
-                    mb: 3,
-                    borderRadius: 3,
-                    border: `1px solid ${theme.palette.divider}`,
+                    mb: 4,
+                    borderRadius: 4,
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    boxShadow: '0 4px 20px rgba(118, 75, 162, 0.3)'
                 }}
             >
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        {notificationsEnabled ? (
-                            <NotificationsActive sx={{ mr: 1, color: theme.palette.primary.main }} />
-                        ) : (
-                            <NotificationsOff sx={{ mr: 1, color: 'text.secondary' }} />
-                        )}
-                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                            Notification Settings
-                        </Typography>
-                    </Box>
-                    {notifications.length > 0 && (
-                        <Button
-                            size="small"
-                            onClick={handleClearAll}
-                            sx={{ textTransform: 'none' }}
-                        >
-                            Clear All
-                        </Button>
-                    )}
+                <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <NotificationsActive />
+                        Push Notifications
+                    </Typography>
+                    <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.5 }}>
+                        Get notified instantly when new announcements are posted
+                    </Typography>
                 </Box>
 
                 <FormControlLabel
@@ -170,51 +174,67 @@ function NotificationsPage() {
                         <Switch
                             checked={notificationsEnabled}
                             onChange={handleToggleNotifications}
-                            color="primary"
+                            color="default"
+                            sx={{
+                                '& .MuiSwitch-switchBase.Mui-checked': {
+                                    color: 'white',
+                                },
+                                '& .MuiSwitch-track': {
+                                    backgroundColor: 'rgba(255,255,255,0.5) !important',
+                                }
+                            }}
                         />
                     }
-                    label={
-                        <Box>
-                            <Typography variant="body1">
-                                Enable Browser Notifications
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                                Get notified when new announcements are posted
-                            </Typography>
-                        </Box>
-                    }
+                    label={<Typography sx={{ fontWeight: 600 }}>{notificationsEnabled ? 'Enabled' : 'Disabled'}</Typography>}
                 />
-
-                {permission === 'denied' && (
-                    <Typography variant="caption" color="error" sx={{ display: 'block', mt: 1 }}>
-                        Notifications are blocked. Please enable them in your browser settings.
-                    </Typography>
-                )}
             </Paper>
 
             {/* Notifications List */}
             <Paper
                 elevation={0}
                 sx={{
-                    borderRadius: 3,
-                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: 4,
+                    border: '1px solid',
+                    borderColor: theme.palette.divider,
                     overflow: 'hidden',
+                    background: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : '#fff',
                 }}
             >
-                <Box sx={{ p: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                <Box sx={{ p: 3, borderBottom: `1px solid ${theme.palette.divider}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
                         Recent Notifications
                     </Typography>
+                    {notifications.length > 0 && (
+                        <Button
+                            size="small"
+                            onClick={handleClearAll}
+                            sx={{ textTransform: 'none', color: 'text.secondary' }}
+                        >
+                            Clear All
+                        </Button>
+                    )}
                 </Box>
 
                 {notifications.length === 0 ? (
                     <Box sx={{ textAlign: 'center', py: 8 }}>
-                        <NotificationsIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
-                        <Typography variant="h6" color="text.secondary">
-                            No notifications yet
+                        <Box sx={{
+                            width: 80,
+                            height: 80,
+                            borderRadius: '50%',
+                            bgcolor: 'rgba(0,0,0,0.03)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            mx: 'auto',
+                            mb: 2
+                        }}>
+                            <NotificationsIcon sx={{ fontSize: 40, color: 'text.disabled', opacity: 0.5 }} />
+                        </Box>
+                        <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 600 }}>
+                            No new notifications
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            You'll see notifications here when announcements are posted
+                            We'll notify you when something important happens
                         </Typography>
                     </Box>
                 ) : (
@@ -223,19 +243,29 @@ function NotificationsPage() {
                             <Box key={notification.id}>
                                 <ListItem
                                     sx={{
-                                        py: 2,
+                                        py: 2.5,
                                         px: 3,
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        backgroundColor: !notification.is_read
+                                            ? (theme.palette.mode === 'dark' ? 'rgba(102, 126, 234, 0.08)' : 'rgba(102, 126, 234, 0.04)')
+                                            : 'transparent',
                                         '&:hover': {
                                             backgroundColor: theme.palette.mode === 'dark'
-                                                ? 'rgba(102, 126, 234, 0.05)'
-                                                : 'rgba(102, 126, 234, 0.02)',
+                                                ? 'rgba(102, 126, 234, 0.15)'
+                                                : 'rgba(102, 126, 234, 0.08)',
                                         },
                                     }}
+                                    onClick={() => !notification.is_read && handleMarkAsRead(notification.id)}
                                     secondaryAction={
                                         <IconButton
                                             edge="end"
-                                            onClick={() => handleDeleteNotification(notification.id)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteNotification(notification.id);
+                                            }}
                                             size="small"
+                                            sx={{ color: 'text.secondary' }}
                                         >
                                             <DeleteIcon fontSize="small" />
                                         </IconButton>
@@ -245,45 +275,47 @@ function NotificationsPage() {
                                         <Avatar
                                             sx={{
                                                 bgcolor: 'rgba(102, 126, 234, 0.1)',
-                                                color: theme.palette.primary.main,
+                                                color: '#667eea',
+                                                border: '1px solid rgba(102, 126, 234, 0.2)'
                                             }}
                                         >
                                             <CampaignIcon />
                                         </Avatar>
                                     </ListItemAvatar>
                                     <ListItemText
+                                        primaryTypographyProps={{ component: 'div' }}
+                                        secondaryTypographyProps={{ component: 'div' }}
                                         primary={
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                                                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                                                <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.95rem' }}>
                                                     {notification.title}
                                                 </Typography>
-                                                {notification.isNew && (
+                                                {!notification.is_read && (
                                                     <Chip
                                                         label="New"
                                                         size="small"
                                                         sx={{
                                                             height: 20,
                                                             fontSize: '0.7rem',
-                                                            bgcolor: theme.palette.primary.main,
+                                                            bgcolor: '#667eea',
                                                             color: 'white',
+                                                            fontWeight: 700
                                                         }}
                                                     />
                                                 )}
-                                            </Box>
-                                        }
-                                        secondary={
-                                            <Box>
-                                                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                                                    {notification.body}
-                                                </Typography>
-                                                <Typography variant="caption" color="text.secondary">
+                                                <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto', mr: 2 }}>
                                                     {formatDate(notification.timestamp)}
                                                 </Typography>
                                             </Box>
                                         }
+                                        secondary={
+                                            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                                                {notification.body}
+                                            </Typography>
+                                        }
                                     />
                                 </ListItem>
-                                {index < notifications.length - 1 && <Divider />}
+                                {index < notifications.length - 1 && <Divider component="li" />}
                             </Box>
                         ))}
                     </List>

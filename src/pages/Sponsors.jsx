@@ -143,9 +143,9 @@ function Sponsors() {
     };
 
     return (
-        <Box sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+        <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1600, mx: 'auto' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                <Typography variant="h4" sx={{ fontWeight: 800 }}>
                     Sponsors
                 </Typography>
                 {isAuthorized && (
@@ -154,9 +154,15 @@ function Sponsors() {
                         startIcon={<AddIcon />}
                         onClick={handleOpenDialog}
                         sx={{
+                            borderRadius: 2,
+                            px: 3,
+                            py: 1,
                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            boxShadow: '0 4px 14px 0 rgba(118, 75, 162, 0.3)',
                             '&:hover': {
                                 background: 'linear-gradient(135deg, #5568d3 0%, #63408a 100%)',
+                                transform: 'translateY(-1px)',
+                                boxShadow: '0 6px 20px 0 rgba(118, 75, 162, 0.4)',
                             },
                         }}
                     >
@@ -166,95 +172,167 @@ function Sponsors() {
             </Box>
 
             {!isAuthorized && (
-                <Alert severity="info" sx={{ mb: 3 }}>
+                <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
                     You don't have permission to add, edit, or delete sponsors. Only authorized users can perform these actions.
                 </Alert>
             )}
 
-            {/* Sponsors Grid */}
-            <Grid container spacing={3}>
+            {/* Sponsors Grid - Fixed Grid Syntax */}
+            <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                gap: 3,
+                animation: 'fadeIn 0.5s ease-in-out',
+                '@keyframes fadeIn': {
+                    '0%': { opacity: 0, transform: 'translateY(20px)' },
+                    '100%': { opacity: 1, transform: 'translateY(0)' },
+                }
+            }}>
                 {sponsors.map((sponsor) => (
-                    <Grid item xs={12} sm={6} md={4} key={sponsor.id}>
-                        <Card
-                            sx={{
-                                height: 400,
-                                borderRadius: 3,
-                                position: 'relative',
+                    <Card
+                        key={sponsor.id}
+                        elevation={0}
+                        sx={{
+                            height: '100%',
+                            minHeight: 400,
+                            borderRadius: 4,
+                            position: 'relative',
+                            background: theme.palette.mode === 'dark'
+                                ? 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'
+                                : '#ffffff',
+                            border: '1px solid',
+                            borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-8px)',
                                 boxShadow: theme.palette.mode === 'dark'
-                                    ? '0 4px 12px rgba(0,0,0,0.3)'
-                                    : '0 4px 12px rgba(0,0,0,0.1)',
-                                transition: 'transform 0.2s',
-                                '&:hover': {
-                                    transform: 'translateY(-4px)',
-                                },
-                                display: 'flex',
-                                flexDirection: 'column',
-                            }}
-                        >
-                            <CardContent sx={{
-                                flex: 1,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                textAlign: 'center',
-                                p: 3,
+                                    ? '0 20px 40px rgba(0,0,0,0.4)'
+                                    : '0 20px 40px rgba(0,0,0,0.1)',
+                                '& .sponsor-actions': {
+                                    opacity: 1,
+                                    transform: 'translateY(0)',
+                                }
+                            },
+                            display: 'flex',
+                            flexDirection: 'column',
+                            overflow: 'visible',
+                        }}
+                    >
+                        <CardContent sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            {/* Header Background */}
+                            <Box sx={{
+                                height: 120,
+                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                borderRadius: '16px 16px 0 0',
+                                position: 'relative',
+                                mb: 6
                             }}>
-                                {/* Edit/Delete Buttons */}
-                                {isAuthorized && (
-                                    <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => handleEdit(sponsor)}
-                                            sx={{ color: theme.palette.primary.main }}
-                                        >
-                                            <EditIcon fontSize="small" />
-                                        </IconButton>
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => handleDelete(sponsor.id)}
-                                            sx={{ color: theme.palette.error.main }}
-                                        >
-                                            <DeleteIcon fontSize="small" />
-                                        </IconButton>
-                                    </Box>
-                                )}
-
                                 {/* Sponsor Image */}
-                                <Box sx={{ mb: 2 }}>
+                                <Box sx={{
+                                    position: 'absolute',
+                                    bottom: -50,
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    p: 0.5,
+                                    bgcolor: theme.palette.background.paper,
+                                    borderRadius: 3,
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+                                }}>
                                     <Avatar
                                         src={sponsor.image}
                                         alt={sponsor.name}
                                         variant="rounded"
                                         sx={{
-                                            width: 120,
-                                            height: 120,
+                                            width: 100,
+                                            height: 100,
                                             fontSize: '3rem',
                                             background: sponsor.image
                                                 ? 'transparent'
                                                 : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                            borderRadius: 2.5
                                         }}
                                     >
                                         {!sponsor.image && sponsor.name.charAt(0).toUpperCase()}
                                     </Avatar>
                                 </Box>
 
-                                {/* Sponsor Name */}
-                                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                                {/* Edit/Delete Buttons */}
+                                {isAuthorized && (
+                                    <Box
+                                        className="sponsor-actions"
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 8,
+                                            right: 8,
+                                            opacity: 0,
+                                            transition: 'all 0.3s ease',
+                                            transform: 'translateY(-10px)',
+                                            display: 'flex',
+                                            gap: 1
+                                        }}
+                                    >
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => handleEdit(sponsor)}
+                                            sx={{
+                                                bgcolor: 'rgba(255,255,255,0.2)',
+                                                color: '#fff',
+                                                '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
+                                            }}
+                                        >
+                                            <EditIcon fontSize="small" />
+                                        </IconButton>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => handleDelete(sponsor.id)}
+                                            sx={{
+                                                bgcolor: 'rgba(255,0,0,0.2)',
+                                                color: '#fff',
+                                                '&:hover': { bgcolor: 'rgba(255,0,0,0.4)' }
+                                            }}
+                                        >
+                                            <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                    </Box>
+                                )}
+                            </Box>
+
+                            <Box sx={{
+                                px: 3,
+                                pb: 4,
+                                flex: 1,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center'
+                            }}>
+                                <Typography variant="h5" sx={{ fontWeight: 800, mb: 2, textAlign: 'center' }}>
                                     {sponsor.name}
                                 </Typography>
 
-                                <Divider sx={{ mb: 2, width: '100%' }} />
+                                <Divider sx={{ width: 40, borderBottomWidth: 3, borderRadius: 1, borderColor: '#667eea', mb: 3 }} />
 
                                 {/* Description */}
-                                <Typography variant="body2" color="text.secondary">
-                                    {sponsor.description}
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
+                                <Box sx={{
+                                    width: '100%',
+                                    p: 2.5,
+                                    borderRadius: 3,
+                                    bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                                    border: '1px solid',
+                                    borderColor: theme.palette.divider,
+                                    flex: 1
+                                }}>
+                                    <Typography variant="body2" color="text.secondary" sx={{
+                                        textAlign: 'center',
+                                        lineHeight: 1.6
+                                    }}>
+                                        {sponsor.description}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </CardContent>
+                    </Card>
                 ))}
-            </Grid>
+            </Box>
 
             {sponsors.length === 0 && (
                 <Box sx={{ textAlign: 'center', py: 8 }}>
