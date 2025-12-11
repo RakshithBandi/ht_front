@@ -52,7 +52,7 @@ function LoginPage() {
         setLoading(true);
 
         try {
-            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://htbackend-production.up.railway.app';
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://compassionate-bravery-production-c3bf.up.railway.app';
             console.log("Using API Base URL:", API_BASE_URL);
             const response = await fetch(`${API_BASE_URL}/api/login/`, {
                 method: 'POST',
