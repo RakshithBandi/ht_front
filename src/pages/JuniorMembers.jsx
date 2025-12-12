@@ -118,15 +118,17 @@ function JuniorMembers() {
             };
 
             if (editingMember) {
-                await membersAPI.junior.update(editingMember.id, memberData);
+                const updatedMember = await membersAPI.junior.update(editingMember.id, memberData);
+                setMembers(prev => prev.map(m => m.id === editingMember.id ? updatedMember : m));
             } else {
-                await membersAPI.junior.create(memberData);
+                const newMember = await membersAPI.junior.create(memberData);
+                setMembers(prev => [newMember, ...prev]);
             }
 
-            await loadMembers();
             handleCloseDialog();
         } catch (err) {
             console.error(err);
+            alert("Failed to save member. Please try again.");
         }
     };
 
@@ -143,11 +145,13 @@ function JuniorMembers() {
     };
 
     const handleDelete = async (memberId) => {
+        if (!window.confirm("Are you sure you want to delete this member?")) return;
         try {
             await membersAPI.junior.delete(memberId);
-            await loadMembers();
+            setMembers(prev => prev.filter(m => m.id !== memberId));
         } catch (err) {
             console.error(err);
+            alert("Failed to delete member. Please try again.");
         }
     };
 

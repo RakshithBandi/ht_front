@@ -87,15 +87,14 @@ function Dashboard() {
             };
 
             if (editingId) {
-                await dashboardService.updateAnnouncement(editingId, announcementData);
+                const updatedAnnouncement = await dashboardService.updateAnnouncement(editingId, announcementData);
+                setAnnouncements(prev => prev.map(a => a.id === editingId ? updatedAnnouncement : a));
             } else {
                 const newAnnouncement = await dashboardService.createAnnouncement(announcementData);
+                setAnnouncements(prev => [newAnnouncement, ...prev]);
                 // Send notification for new announcement
                 sendNotification(newAnnouncement);
             }
-
-            // Reload data to get fresh list
-            await loadDashboardData();
 
             // Reset form
             setFormData({
@@ -106,6 +105,7 @@ function Dashboard() {
             setEditingId(null);
         } catch (error) {
             console.error(error);
+            alert("Failed to save announcement");
         }
     };
 
@@ -147,11 +147,13 @@ function Dashboard() {
     };
 
     const handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this announcement?")) return;
         try {
             await dashboardService.deleteAnnouncement(id);
-            await loadDashboardData();
+            setAnnouncements(prev => prev.filter(a => a.id !== id));
         } catch (error) {
             console.error(error);
+            alert("Failed to delete announcement");
         }
     };
 

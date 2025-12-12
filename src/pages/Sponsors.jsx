@@ -111,15 +111,17 @@ function Sponsors() {
             };
 
             if (editingSponsor) {
-                await sponsorsAPI.update(editingSponsor.id, sponsorData);
+                const updatedSponsor = await sponsorsAPI.update(editingSponsor.id, sponsorData);
+                setSponsors(prev => prev.map(s => s.id === editingSponsor.id ? updatedSponsor : s));
             } else {
-                await sponsorsAPI.create(sponsorData);
+                const newSponsor = await sponsorsAPI.create(sponsorData);
+                setSponsors(prev => [newSponsor, ...prev]);
             }
 
-            await loadSponsors();
             handleCloseDialog();
         } catch (err) {
             console.error(err);
+            alert("Failed to save sponsor. Please try again.");
         }
     };
 
@@ -134,11 +136,13 @@ function Sponsors() {
     };
 
     const handleDelete = async (sponsorId) => {
+        if (!window.confirm("Are you sure you want to delete this sponsor?")) return;
         try {
             await sponsorsAPI.delete(sponsorId);
-            await loadSponsors();
+            setSponsors(prev => prev.filter(s => s.id !== sponsorId));
         } catch (err) {
             console.error(err);
+            alert("Failed to delete sponsor. Please try again.");
         }
     };
 

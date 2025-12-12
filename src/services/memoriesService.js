@@ -7,7 +7,11 @@ const memoriesAPI = {
     },
 
     create: async (memoryData) => {
-        const response = await api.post('/api/memories/', memoryData);
+        const config = {};
+        if (memoryData instanceof FormData) {
+            config.headers = { 'Content-Type': 'multipart/form-data' };
+        }
+        const response = await api.post('/api/memories/', memoryData, config);
         return response.data;
     },
 

@@ -118,15 +118,17 @@ function TemporaryMembers() {
             };
 
             if (editingMember) {
-                await membersAPI.temporary.update(editingMember.id, memberData);
+                const updatedMember = await membersAPI.temporary.update(editingMember.id, memberData);
+                setMembers(prev => prev.map(m => m.id === editingMember.id ? updatedMember : m));
             } else {
-                await membersAPI.temporary.create(memberData);
+                const newMember = await membersAPI.temporary.create(memberData);
+                setMembers(prev => [newMember, ...prev]);
             }
 
-            await loadMembers();
             handleCloseDialog();
         } catch (err) {
             console.error(err);
+            alert("Failed to save member. Please try again.");
         }
     };
 
@@ -143,11 +145,13 @@ function TemporaryMembers() {
     };
 
     const handleDelete = async (memberId) => {
+        if (!window.confirm("Are you sure you want to delete this member?")) return;
         try {
             await membersAPI.temporary.delete(memberId);
-            await loadMembers();
+            setMembers(prev => prev.filter(m => m.id !== memberId));
         } catch (err) {
             console.error(err);
+            alert("Failed to delete member. Please try again.");
         }
     };
 

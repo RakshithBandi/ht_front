@@ -122,15 +122,17 @@ function Games() {
             };
 
             if (editingGame) {
-                await gamesAPI.update(editingGame.id, gameData);
+                const updatedGame = await gamesAPI.update(editingGame.id, gameData);
+                setGames(prev => prev.map(g => g.id === editingGame.id ? updatedGame : g));
             } else {
-                await gamesAPI.create(gameData);
+                const newGame = await gamesAPI.create(gameData);
+                setGames(prev => [newGame, ...prev]);
             }
 
-            await loadGames();
             handleCloseDialog();
         } catch (err) {
             console.error(err);
+            alert("Failed to save game. Please try again.");
         }
     };
 
@@ -147,11 +149,13 @@ function Games() {
     };
 
     const handleDelete = async (gameId) => {
+        if (!window.confirm("Are you sure you want to delete this game?")) return;
         try {
             await gamesAPI.delete(gameId);
-            await loadGames();
+            setGames(prev => prev.filter(g => g.id !== gameId));
         } catch (err) {
             console.error(err);
+            alert("Failed to delete game. Please try again.");
         }
     };
 

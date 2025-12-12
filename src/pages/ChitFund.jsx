@@ -142,15 +142,17 @@ function ChitFund() {
             };
 
             if (editingItem) {
-                await chitfundAPI.update(editingItem.id, chitfundData);
+                const updatedItem = await chitfundAPI.update(editingItem.id, chitfundData);
+                setChitFunds(prev => prev.map(item => item.id === editingItem.id ? updatedItem : item));
             } else {
-                await chitfundAPI.create(chitfundData);
+                const newItem = await chitfundAPI.create(chitfundData);
+                setChitFunds(prev => [newItem, ...prev]);
             }
 
-            await loadChitFunds();
             handleCloseDialog();
         } catch (err) {
             console.error(err);
+            alert("Failed to save chit fund details. Please try again.");
         }
     };
 
@@ -170,11 +172,13 @@ function ChitFund() {
     };
 
     const handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this chit fund record?")) return;
         try {
             await chitfundAPI.delete(id);
-            await loadChitFunds();
+            setChitFunds(prev => prev.filter(item => item.id !== id));
         } catch (err) {
             console.error(err);
+            alert("Failed to delete chit fund record. Please try again.");
         }
     };
 

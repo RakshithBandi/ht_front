@@ -141,7 +141,13 @@ const Quiz = () => {
             formData.append('correct_answer', newQuestion.correct_answer);
             formData.append('year', newQuestion.year);
 
-            await quizService.createQuestion(formData);
+            const createdQuestion = await quizService.createQuestion(formData);
+
+            // Only update local state if the new question belongs to the currently selected year
+            if (parseInt(createdQuestion.year) === parseInt(selectedYear)) {
+                setQuestions(prev => [...prev, createdQuestion]);
+            }
+
             setIsCreateDialogOpen(false);
             setNewQuestion({
                 question_text: '',
@@ -154,18 +160,20 @@ const Quiz = () => {
                 year: new Date().getFullYear()
             });
             setImagePreview(null);
-            loadData();
         } catch (error) {
             console.error("Failed to create question", error);
+            alert("Failed to create question. Please try again.");
         }
     };
 
     const handleDeleteQuestion = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this question?")) return;
         try {
             await quizService.deleteQuestion(id);
-            loadData();
+            setQuestions(prev => prev.filter(q => q.id !== id));
         } catch (error) {
             console.error("Failed to delete question", error);
+            alert("Failed to delete question. Please try again.");
         }
     };
 

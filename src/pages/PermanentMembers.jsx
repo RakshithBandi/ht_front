@@ -118,15 +118,17 @@ function PermanentMembers() {
             };
 
             if (editingMember) {
-                await membersAPI.permanent.update(editingMember.id, memberData);
+                const updatedMember = await membersAPI.permanent.update(editingMember.id, memberData);
+                setMembers(prev => prev.map(m => m.id === editingMember.id ? updatedMember : m));
             } else {
-                await membersAPI.permanent.create(memberData);
+                const newMember = await membersAPI.permanent.create(memberData);
+                setMembers(prev => [newMember, ...prev]);
             }
 
-            await loadMembers();
             handleCloseDialog();
         } catch (err) {
             console.error(err);
+            alert("Failed to save member. Please try again.");
         }
     };
 
@@ -143,11 +145,13 @@ function PermanentMembers() {
     };
 
     const handleDelete = async (memberId) => {
+        if (!window.confirm("Are you sure you want to delete this member?")) return;
         try {
             await membersAPI.permanent.delete(memberId);
-            await loadMembers();
+            setMembers(prev => prev.filter(m => m.id !== memberId));
         } catch (err) {
             console.error(err);
+            alert("Failed to delete member. Please try again.");
         }
     };
 
@@ -212,7 +216,7 @@ function PermanentMembers() {
                             minHeight: 400,
                             borderRadius: 4,
                             position: 'relative',
-                            background: theme.palette.mode === 'dark' 
+                            background: theme.palette.mode === 'dark'
                                 ? 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'
                                 : '#ffffff',
                             border: '1px solid',
@@ -269,11 +273,11 @@ function PermanentMembers() {
                                 </Box>
 
                                 {isAuthorized && (
-                                    <Box 
+                                    <Box
                                         className="member-actions"
-                                        sx={{ 
-                                            position: 'absolute', 
-                                            top: 8, 
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 8,
                                             right: 8,
                                             opacity: 0,
                                             transition: 'all 0.3s ease',
@@ -285,8 +289,8 @@ function PermanentMembers() {
                                         <IconButton
                                             size="small"
                                             onClick={() => handleEdit(member)}
-                                            sx={{ 
-                                                bgcolor: 'rgba(255,255,255,0.2)', 
+                                            sx={{
+                                                bgcolor: 'rgba(255,255,255,0.2)',
                                                 color: '#fff',
                                                 '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
                                             }}
@@ -296,8 +300,8 @@ function PermanentMembers() {
                                         <IconButton
                                             size="small"
                                             onClick={() => handleDelete(member.id)}
-                                            sx={{ 
-                                                bgcolor: 'rgba(255,0,0,0.2)', 
+                                            sx={{
+                                                bgcolor: 'rgba(255,0,0,0.2)',
                                                 color: '#fff',
                                                 '&:hover': { bgcolor: 'rgba(255,0,0,0.4)' }
                                             }}
@@ -317,12 +321,12 @@ function PermanentMembers() {
                                 </Typography>
 
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
-                                    <Box sx={{ 
-                                        p: 2, 
-                                        borderRadius: 3, 
+                                    <Box sx={{
+                                        p: 2,
+                                        borderRadius: 3,
                                         bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
                                         border: '1px solid',
-                                        borderColor: theme.palette.divider 
+                                        borderColor: theme.palette.divider
                                     }}>
                                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
                                             Invested Amount
@@ -332,12 +336,12 @@ function PermanentMembers() {
                                         </Typography>
                                     </Box>
 
-                                    <Box sx={{ 
-                                        p: 2, 
-                                        borderRadius: 3, 
+                                    <Box sx={{
+                                        p: 2,
+                                        borderRadius: 3,
                                         bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
                                         border: '1px solid',
-                                        borderColor: theme.palette.divider 
+                                        borderColor: theme.palette.divider
                                     }}>
                                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
                                             Paid This Year
@@ -359,8 +363,8 @@ function PermanentMembers() {
                                     <Typography variant="caption" sx={{ color: '#764ba2', fontWeight: 600, display: 'block', mb: 0.5 }}>
                                         TOTAL CONTRIBUTION
                                     </Typography>
-                                    <Typography variant="h5" sx={{ 
-                                        fontWeight: 800, 
+                                    <Typography variant="h5" sx={{
+                                        fontWeight: 800,
                                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                         WebkitBackgroundClip: 'text',
                                         WebkitTextFillColor: 'transparent'

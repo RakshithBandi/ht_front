@@ -104,20 +104,23 @@ function Expenditures() {
                 amountSpent: parseFloat(formData.amountSpent) || 0,
             };
 
-            await expenditureAPI.create(expenditureData);
-            await loadExpenditures();
+            const newExpenditure = await expenditureAPI.create(expenditureData);
+            setExpenditures(prev => [newExpenditure, ...prev]);
             handleCloseDialog();
         } catch (err) {
             console.error(err);
+            alert("Failed to add expenditure. Please try again.");
         }
     };
 
     const handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this expenditure?")) return;
         try {
             await expenditureAPI.delete(id);
-            await loadExpenditures();
+            setExpenditures(prev => prev.filter(exp => exp.id !== id));
         } catch (err) {
             console.error(err);
+            alert("Failed to delete expenditure. Please try again.");
         }
     };
 
