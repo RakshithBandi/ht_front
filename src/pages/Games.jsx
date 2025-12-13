@@ -17,6 +17,7 @@ import {
     Avatar,
     Divider,
     Chip,
+    InputAdornment
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -26,6 +27,7 @@ import {
     Cancel as CancelIcon,
     EmojiEvents as TrophyIcon,
     People as PeopleIcon,
+    Search as SearchIcon
 } from '@mui/icons-material';
 import { useAuth } from '../services/authComponents';
 import gamesAPI from '../services/gamesService';
@@ -33,6 +35,7 @@ import gamesAPI from '../services/gamesService';
 function Games() {
     const theme = useTheme();
     const [games, setGames] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [openDialog, setOpenDialog] = useState(false);
     const [editingGame, setEditingGame] = useState(null);
     const [formData, setFormData] = useState({
@@ -165,27 +168,64 @@ function Games() {
                 <Typography variant="h4" sx={{ fontWeight: 800 }}>
                     Games
                 </Typography>
-                {isAuthorized && (
-                    <Button
-                        variant="contained"
-                        startIcon={<AddIcon />}
-                        onClick={handleOpenDialog}
-                        sx={{
-                            borderRadius: 2,
-                            px: 3,
-                            py: 1,
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            boxShadow: '0 4px 14px 0 rgba(118, 75, 162, 0.3)',
-                            '&:hover': {
-                                background: 'linear-gradient(135deg, #5568d3 0%, #63408a 100%)',
-                                transform: 'translateY(-1px)',
-                                boxShadow: '0 6px 20px 0 rgba(118, 75, 162, 0.4)',
-                            },
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                    <TextField
+                        variant="outlined"
+                        placeholder="Search games..."
+                        size="small"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon color="action" />
+                                </InputAdornment>
+                            ),
                         }}
-                    >
-                        Add Game
-                    </Button>
-                )}
+                        sx={{ bgcolor: 'background.paper', borderRadius: 2, minWidth: { xs: '100%', sm: 250 }, display: { xs: 'none', sm: 'flex' } }}
+                    />
+                    {isAuthorized && (
+                        <Button
+                            variant="contained"
+                            startIcon={<AddIcon />}
+                            onClick={handleOpenDialog}
+                            sx={{
+                                borderRadius: 2,
+                                px: 3,
+                                py: 1,
+                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                boxShadow: '0 4px 14px 0 rgba(118, 75, 162, 0.3)',
+                                '&:hover': {
+                                    background: 'linear-gradient(135deg, #5568d3 0%, #63408a 100%)',
+                                    transform: 'translateY(-1px)',
+                                    boxShadow: '0 6px 20px 0 rgba(118, 75, 162, 0.4)',
+                                },
+                            }}
+                        >
+                            Add Game
+                        </Button>
+                    )}
+                </Box>
+            </Box>
+
+            {/* Mobile Search Bar */}
+            <Box sx={{ mb: 3, display: { xs: 'block', sm: 'none' } }}>
+                <TextField
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Search games..."
+                    size="small"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon color="action" />
+                            </InputAdornment>
+                        ),
+                    }}
+                    sx={{ bgcolor: 'background.paper', borderRadius: 2 }}
+                />
             </Box>
 
             {!isAuthorized && (
@@ -195,175 +235,178 @@ function Games() {
             )}
 
             {/* Games Grid - Fixed Grid Syntax */}
-            <Box sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                gap: 3,
+            <Grid container spacing={3} sx={{
                 animation: 'fadeIn 0.5s ease-in-out',
                 '@keyframes fadeIn': {
                     '0%': { opacity: 0, transform: 'translateY(20px)' },
                     '100%': { opacity: 1, transform: 'translateY(0)' },
                 }
             }}>
-                {games.map((game) => (
-                    <Card
-                        key={game.id}
-                        elevation={0}
-                        sx={{
-                            height: '100%',
-                            borderRadius: 4,
-                            position: 'relative',
-                            background: theme.palette.mode === 'dark'
-                                ? 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'
-                                : '#ffffff',
-                            border: '1px solid',
-                            borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            '&:hover': {
-                                transform: 'translateY(-8px)',
-                                boxShadow: theme.palette.mode === 'dark'
-                                    ? '0 20px 40px rgba(0,0,0,0.4)'
-                                    : '0 20px 40px rgba(0,0,0,0.1)',
-                                '& .game-actions': {
-                                    opacity: 1,
-                                    transform: 'translateY(0)',
-                                }
-                            },
-                            display: 'flex',
-                            flexDirection: 'column',
-                            overflow: 'visible',
-                        }}
-                    >
-                        <CardContent sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            {/* Header Background */}
-                            <Box sx={{
-                                height: 80,
-                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                borderRadius: '16px 16px 0 0',
-                                position: 'relative',
-                                mb: 4,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}>
-                                <TrophyIcon sx={{ fontSize: 40, color: 'rgba(255,255,255,0.3)' }} />
+                {games
+                    .filter(game => game.gameName.toLowerCase().includes(searchTerm.toLowerCase()))
+                    .map((game) => (
+                        <Grid item xs={12} sm={6} md={4} key={game.id}>
+                            <Card
+                                elevation={0}
+                                sx={{
+                                    height: '100%',
+                                    borderRadius: 4,
+                                    position: 'relative',
+                                    background: theme.palette.mode === 'dark'
+                                        ? 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'
+                                        : '#ffffff',
+                                    border: '1px solid',
+                                    borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    '&:hover': {
+                                        transform: 'translateY(-8px)',
+                                        boxShadow: theme.palette.mode === 'dark'
+                                            ? '0 20px 40px rgba(0,0,0,0.4)'
+                                            : '0 20px 40px rgba(0,0,0,0.1)',
+                                        '& .game-actions': {
+                                            opacity: 1,
+                                            transform: 'translateY(0)',
+                                        }
+                                    },
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    overflow: 'visible',
+                                }}
+                            >
+                                <CardContent sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                    {/* Header Background */}
+                                    <Box sx={{
+                                        height: 80,
+                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                        borderRadius: '16px 16px 0 0',
+                                        position: 'relative',
+                                        mb: 4,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}>
+                                        <TrophyIcon sx={{ fontSize: 40, color: 'rgba(255,255,255,0.3)' }} />
 
-                                {/* Edit/Delete Buttons */}
-                                {isAuthorized && (
-                                    <Box
-                                        className="game-actions"
-                                        sx={{
-                                            position: 'absolute',
-                                            top: 8,
-                                            right: 8,
-                                            opacity: 0,
-                                            transition: 'all 0.3s ease',
-                                            transform: 'translateY(-10px)',
-                                            display: 'flex',
-                                            gap: 1
-                                        }}
-                                    >
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => handleEdit(game)}
-                                            sx={{
-                                                bgcolor: 'rgba(255,255,255,0.2)',
-                                                color: '#fff',
-                                                '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
-                                            }}
-                                        >
-                                            <EditIcon fontSize="small" />
-                                        </IconButton>
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => handleDelete(game.id)}
-                                            sx={{
-                                                bgcolor: 'rgba(255,0,0,0.2)',
-                                                color: '#fff',
-                                                '&:hover': { bgcolor: 'rgba(255,0,0,0.4)' }
-                                            }}
-                                        >
-                                            <DeleteIcon fontSize="small" />
-                                        </IconButton>
+                                        {/* Edit/Delete Buttons */}
+                                        {isAuthorized && (
+                                            <Box
+                                                className="game-actions"
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: 8,
+                                                    right: 8,
+                                                    opacity: 0,
+                                                    transition: 'all 0.3s ease',
+                                                    transform: 'translateY(-10px)',
+                                                    display: 'flex',
+                                                    gap: 1
+                                                }}
+                                            >
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => handleEdit(game)}
+                                                    sx={{
+                                                        bgcolor: 'rgba(255,255,255,0.2)',
+                                                        color: '#fff',
+                                                        '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
+                                                    }}
+                                                >
+                                                    <EditIcon fontSize="small" />
+                                                </IconButton>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => handleDelete(game.id)}
+                                                    sx={{
+                                                        bgcolor: 'rgba(255,0,0,0.2)',
+                                                        color: '#fff',
+                                                        '&:hover': { bgcolor: 'rgba(255,0,0,0.4)' }
+                                                    }}
+                                                >
+                                                    <DeleteIcon fontSize="small" />
+                                                </IconButton>
+                                            </Box>
+                                        )}
                                     </Box>
-                                )}
-                            </Box>
 
-                            <Box sx={{ px: 3, pb: 4, flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                <Typography variant="h5" sx={{ fontWeight: 800, mb: 1.5, textAlign: 'center' }}>
-                                    {game.gameName}
-                                </Typography>
+                                    <Box sx={{ px: 3, pb: 4, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                        <Typography variant="h5" sx={{ fontWeight: 800, mb: 1.5, textAlign: 'center' }}>
+                                            {game.gameName}
+                                        </Typography>
 
-                                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-                                    <Chip
-                                        icon={<PeopleIcon sx={{ fontSize: '1rem !important' }} />}
-                                        label={`${game.participantsCount} Participants`}
-                                        sx={{
-                                            bgcolor: 'rgba(118, 75, 162, 0.1)',
-                                            color: '#764ba2',
-                                            fontWeight: 600,
-                                            height: 28
-                                        }}
-                                    />
-                                </Box>
+                                        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+                                            <Chip
+                                                icon={<PeopleIcon sx={{ fontSize: '1rem !important' }} />}
+                                                label={`${game.participantsCount} Participants`}
+                                                sx={{
+                                                    bgcolor: 'rgba(118, 75, 162, 0.1)',
+                                                    color: '#764ba2',
+                                                    fontWeight: 600,
+                                                    height: 28
+                                                }}
+                                            />
+                                        </Box>
 
-                                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 3, flex: 1 }}>
-                                    {game.description}
-                                </Typography>
+                                        <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 3, flex: 1 }}>
+                                            {game.description}
+                                        </Typography>
 
-                                {/* Winner Section */}
-                                <Box
-                                    sx={{
-                                        p: 2,
-                                        borderRadius: 3,
-                                        background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 165, 0, 0.05) 100%)',
-                                        border: '1px solid',
-                                        borderColor: 'rgba(255, 215, 0, 0.3)',
-                                        mt: 'auto'
-                                    }}
-                                >
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                        {/* Winner Image */}
-                                        <Avatar
-                                            src={game.winnerImage}
-                                            alt={game.winnerName}
+                                        {/* Winner Section */}
+                                        <Box
                                             sx={{
-                                                width: 50,
-                                                height: 50,
-                                                border: '2px solid #FFD700',
-                                                background: game.winnerImage
-                                                    ? 'transparent'
-                                                    : 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
-                                                boxShadow: '0 4px 10px rgba(255, 215, 0, 0.2)'
+                                                p: 2,
+                                                borderRadius: 3,
+                                                background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 165, 0, 0.05) 100%)',
+                                                border: '1px solid',
+                                                borderColor: 'rgba(255, 215, 0, 0.3)',
+                                                mt: 'auto'
                                             }}
                                         >
-                                            {!game.winnerImage && game.winnerName.charAt(0).toUpperCase()}
-                                        </Avatar>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                {/* Winner Image */}
+                                                <Avatar
+                                                    src={game.winnerImage}
+                                                    alt={game.winnerName}
+                                                    sx={{
+                                                        width: 50,
+                                                        height: 50,
+                                                        border: '2px solid #FFD700',
+                                                        background: game.winnerImage
+                                                            ? 'transparent'
+                                                            : 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                                                        boxShadow: '0 4px 10px rgba(255, 215, 0, 0.2)'
+                                                    }}
+                                                >
+                                                    {!game.winnerImage && game.winnerName.charAt(0).toUpperCase()}
+                                                </Avatar>
 
-                                        {/* Winner Info */}
-                                        <Box>
-                                            <Typography variant="caption" sx={{ color: '#DAA520', fontWeight: 700, display: 'block', mb: 0.5, letterSpacing: 0.5, textTransform: 'uppercase' }}>
-                                                🏆 Winner
-                                            </Typography>
-                                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: theme.palette.text.primary, lineHeight: 1.2 }}>
-                                                {game.winnerName}
-                                            </Typography>
+                                                {/* Winner Info */}
+                                                <Box>
+                                                    <Typography variant="caption" sx={{ color: '#DAA520', fontWeight: 700, display: 'block', mb: 0.5, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                                                        🏆 Winner
+                                                    </Typography>
+                                                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: theme.palette.text.primary, lineHeight: 1.2 }}>
+                                                        {game.winnerName}
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
                                         </Box>
                                     </Box>
-                                </Box>
-                            </Box>
-                        </CardContent>
-                    </Card>
-                ))}
-            </Box>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    ))
+                }
+            </Grid >
 
-            {games.length === 0 && (
-                <Box sx={{ textAlign: 'center', py: 8 }}>
-                    <Typography variant="h6" color="text.secondary">
-                        No games added yet
-                    </Typography>
-                </Box>
-            )}
+            {
+                games.length === 0 && (
+                    <Box sx={{ textAlign: 'center', py: 8 }}>
+                        <Typography variant="h6" color="text.secondary">
+                            No games added yet
+                        </Typography>
+                    </Box>
+                )
+            }
 
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
@@ -468,7 +511,7 @@ function Games() {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Box>
+        </Box >
     );
 }
 

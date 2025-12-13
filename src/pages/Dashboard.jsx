@@ -13,6 +13,7 @@ import {
     Paper,
     Divider,
     Alert,
+    InputAdornment
 } from '@mui/material';
 import {
     People as PeopleIcon,
@@ -24,6 +25,7 @@ import {
     Edit as EditIcon,
     Delete as DeleteIcon,
     Campaign as CampaignIcon,
+    Search as SearchIcon
 } from '@mui/icons-material';
 import { useAuth } from '../services/authComponents';
 import { useLanguage } from '../context/LanguageContext';
@@ -42,6 +44,7 @@ function Dashboard() {
     });
 
     const [announcements, setAnnouncements] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [formData, setFormData] = useState({
         heading: '',
         year: new Date().getFullYear().toString(),
@@ -228,7 +231,27 @@ function Dashboard() {
     );
 
     return (
-        <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1600, mx: 'auto' }}>
+        <Box sx={{
+            p: { xs: 2, md: 4 },
+            maxWidth: 1600,
+            mx: 'auto',
+            position: 'relative',
+            '&::before': {
+                content: '""',
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundImage: 'url(/dashboard_background.png)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                opacity: 0.03,
+                zIndex: -1,
+                pointerEvents: 'none',
+            }
+        }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
                 <Typography variant="h4" sx={{ fontWeight: 800 }}>
                     {t('dashboard')}
@@ -236,43 +259,48 @@ function Dashboard() {
             </Box>
 
             {/* Stats Grid - Fixed Grid Syntax */}
-            <Box sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                gap: 3,
-                mb: 6
-            }}>
-                <StatCard
-                    title={t('permanentMembers')}
-                    count={stats.permanentMembers}
-                    icon={<PeopleIcon fontSize="medium" />}
-                    color="#6366f1"
-                />
-                <StatCard
-                    title={t('temporaryMembers')}
-                    count={stats.temporaryMembers}
-                    icon={<PersonOutlineIcon fontSize="medium" />}
-                    color="#8b5cf6"
-                />
-                <StatCard
-                    title={t('juniorMembers')}
-                    count={stats.juniorMembers}
-                    icon={<ChildCareIcon fontSize="medium" />}
-                    color="#ec4899"
-                />
-                <StatCard
-                    title={t('sponsors')}
-                    count={stats.sponsors}
-                    icon={<StoreIcon fontSize="medium" />}
-                    color="#10b981"
-                />
-                <StatCard
-                    title={t('winners')}
-                    count={stats.winners}
-                    icon={<TrophyIcon fontSize="medium" />}
-                    color="#f59e0b"
-                />
-            </Box>
+            <Grid container spacing={3} sx={{ mb: 6 }}>
+                <Grid item xs={12} sm={6} md={2.4}>
+                    <StatCard
+                        title={t('permanentMembers')}
+                        count={stats.permanentMembers}
+                        icon={<PeopleIcon fontSize="medium" />}
+                        color="#6366f1"
+                    />
+                </Grid>
+                <Grid item xs={12} sm={6} md={2.4}>
+                    <StatCard
+                        title={t('temporaryMembers')}
+                        count={stats.temporaryMembers}
+                        icon={<PersonOutlineIcon fontSize="medium" />}
+                        color="#8b5cf6"
+                    />
+                </Grid>
+                <Grid item xs={12} sm={6} md={2.4}>
+                    <StatCard
+                        title={t('juniorMembers')}
+                        count={stats.juniorMembers}
+                        icon={<ChildCareIcon fontSize="medium" />}
+                        color="#ec4899"
+                    />
+                </Grid>
+                <Grid item xs={12} sm={6} md={2.4}>
+                    <StatCard
+                        title={t('sponsors')}
+                        count={stats.sponsors}
+                        icon={<StoreIcon fontSize="medium" />}
+                        color="#10b981"
+                    />
+                </Grid>
+                <Grid item xs={12} sm={6} md={2.4}>
+                    <StatCard
+                        title={t('winners')}
+                        count={stats.winners}
+                        icon={<TrophyIcon fontSize="medium" />}
+                        color="#f59e0b"
+                    />
+                </Grid>
+            </Grid>
 
             {/* Announcements Section */}
             <Box>
@@ -280,6 +308,21 @@ function Dashboard() {
                     <Typography variant="h5" sx={{ fontWeight: 700 }}>
                         {t('announcements')}
                     </Typography>
+                    <TextField
+                        variant="outlined"
+                        placeholder="Search announcements..."
+                        size="small"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon color="action" />
+                                </InputAdornment>
+                            ),
+                        }}
+                        sx={{ bgcolor: 'background.paper', borderRadius: 2, minWidth: { xs: 150, sm: 250 } }}
+                    />
                 </Box>
 
                 {/* Add Announcement Form */}
@@ -372,80 +415,107 @@ function Dashboard() {
                 )}
 
                 {/* Announcements Grid */}
-                <Box sx={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                    gap: 3
-                }}>
-                    {announcements.map((announcement) => (
-                        <Card
-                            key={announcement.id}
-                            elevation={0}
-                            sx={{
-                                height: '100%',
-                                minHeight: 250,
-                                borderRadius: 4,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                background: theme.palette.mode === 'dark'
-                                    ? 'rgba(255,255,255,0.03)'
-                                    : '#ffffff',
-                                border: '1px solid',
-                                borderColor: theme.palette.divider,
-                                transition: 'all 0.3s ease',
-                                '&:hover': {
-                                    transform: 'translateY(-4px)',
-                                    boxShadow: '0 12px 40px rgba(0,0,0,0.08)',
-                                    borderColor: theme.palette.primary.main,
-                                },
-                            }}
-                        >
-                            <CardContent sx={{ p: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                                    <Box sx={{ display: 'flex', gap: 2 }}>
-                                        <Box sx={{
-                                            width: 4,
-                                            height: 40,
-                                            borderRadius: 2,
-                                            bgcolor: theme.palette.primary.main
-                                        }} />
-                                        <Box>
-                                            <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+                <Grid container spacing={3}>
+                    {announcements
+                        .filter(a =>
+                            a.heading.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            a.description.toLowerCase().includes(searchTerm.toLowerCase())
+                        )
+                        .map((announcement) => (
+                            <Grid item xs={12} sm={6} md={4} key={announcement.id}>
+                                <Card
+                                    elevation={0}
+                                    sx={{
+                                        position: 'relative',
+                                        height: '100%',
+                                        borderRadius: 4,
+                                        border: '1px solid',
+                                        borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                        background: theme.palette.mode === 'dark'
+                                            ? 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'
+                                            : '#ffffff',
+                                        transition: 'all 0.3s ease',
+                                        '&:hover': {
+                                            transform: 'translateY(-5px)',
+                                            boxShadow: theme.palette.mode === 'dark'
+                                                ? '0 8px 32px rgba(0,0,0,0.3)'
+                                                : '0 8px 32px rgba(0,0,0,0.1)',
+                                        },
+                                        overflow: 'visible'
+                                    }}
+                                >
+                                    {/* ... rest of the card content ... */}
+                                    <Box sx={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        height: 4,
+                                        background: 'linear-gradient(90deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)',
+                                        borderRadius: '4px 4px 0 0',
+                                    }} />
+
+                                    <CardContent sx={{ p: 3, pt: 4 }}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                            <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
                                                 {announcement.heading}
                                             </Typography>
-                                            <Typography variant="caption" sx={{
-                                                display: 'inline-block',
-                                                mt: 0.5,
-                                                px: 1,
-                                                py: 0.25,
-                                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                                                borderRadius: 1,
-                                                fontWeight: 600
-                                            }}>
+                                            <Typography
+                                                variant="caption"
+                                                sx={{
+                                                    px: 1.5,
+                                                    py: 0.5,
+                                                    borderRadius: 2,
+                                                    bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                                    fontWeight: 600,
+                                                    color: 'text.secondary'
+                                                }}
+                                            >
                                                 {announcement.year}
                                             </Typography>
                                         </Box>
-                                    </Box>
 
-                                    {isAuthorized && (
-                                        <Box>
-                                            <IconButton size="small" onClick={() => handleEdit(announcement)}>
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                            <IconButton size="small" onClick={() => handleDelete(announcement.id)} color="error">
-                                                <DeleteIcon fontSize="small" />
-                                            </IconButton>
-                                        </Box>
-                                    )}
-                                </Box>
+                                        <Divider sx={{ mb: 2 }} />
 
-                                <Typography variant="body2" color="text.secondary" sx={{ flex: 1, lineHeight: 1.7 }}>
-                                    {announcement.description}
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </Box>
+                                        <Typography variant="body2" color="text.secondary" sx={{
+                                            lineHeight: 1.6,
+                                            mb: 3,
+                                            minHeight: '3.2em', // Approximately 2 lines
+                                        }}>
+                                            {announcement.description}
+                                        </Typography>
+
+                                        {isAuthorized && (
+                                            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 'auto' }}>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => handleEdit(announcement)}
+                                                    sx={{
+                                                        color: theme.palette.primary.main,
+                                                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                                        '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.2) }
+                                                    }}
+                                                >
+                                                    <EditIcon fontSize="small" />
+                                                </IconButton>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => handleDelete(announcement.id)}
+                                                    sx={{
+                                                        color: theme.palette.error.main,
+                                                        bgcolor: alpha(theme.palette.error.main, 0.1),
+                                                        '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.2) }
+                                                    }}
+                                                >
+                                                    <DeleteIcon fontSize="small" />
+                                                </IconButton>
+                                            </Box>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))}
+                </Grid>
 
                 {announcements.length === 0 && (
                     <Box sx={{

@@ -16,14 +16,16 @@ import {
     DialogActions,
     TextField,
     Alert,
-    useTheme
+    useTheme,
+    InputAdornment
 } from '@mui/material';
 import {
     Image as ImageIcon,
     Videocam as VideoIcon,
     CloudUpload as UploadIcon,
     Delete as DeleteIcon,
-    Close as CloseIcon
+    Close as CloseIcon,
+    Search as SearchIcon
 } from '@mui/icons-material';
 import memoriesAPI from '../services/memoriesService';
 import { useAuth } from '../services/authComponents';
@@ -32,7 +34,7 @@ function TabPanel(props) {
     const { children, value, index, ...other } = props;
 
     return (
-        <div
+        <div 
             role="tabpanel"
             hidden={value !== index}
             id={`memory-tabpanel-${index}`}
@@ -52,6 +54,7 @@ function Memories() {
     const theme = useTheme();
     const [tabValue, setTabValue] = useState(0);
     const [memories, setMemories] = useState({ images: [], videos: [] });
+    const [searchTerm, setSearchTerm] = useState('');
     const [openDialog, setOpenDialog] = useState(false);
     const [uploadType, setUploadType] = useState('image'); // 'image' or 'video'
     const [formData, setFormData] = useState({
@@ -143,7 +146,8 @@ function Memories() {
                 if (uploadType === 'image') {
                     setCompressing(true);
                     const { compressImage } = await import('../utils/imageCompression');
-                    const compressedBase64 = await compressImage(file);
+                    // Increased quality/size as per user request: 1280px width, 0.8 quality
+                    const compressedBase64 = await compressImage(file, 1280, 0.8);
                     const compressedFile = dataURLtoFile(compressedBase64, file.name);
 
                     setFormData(prev => ({
@@ -185,10 +189,26 @@ function Memories() {
                 return updated;
             });
 
+            // Force refresh to ensure data consistency
+            await loadMemories();
+
             handleCloseDialog();
         } catch (err) {
             console.error(err);
-            alert("Failed to upload memory. Please try again.");
+            let errorMessage = "Failed to upload memory.";
+            if (err.response && err.response.data) {
+                if (typeof err.response.data === 'object') {
+                    // Convert object errors (like validation errors) to string
+                    errorMessage = Object.entries(err.response.data)
+                        .map(([key, value]) => `${key}: ${value}`)
+                        .join('\n');
+                } else {
+                    errorMessage = err.response.data;
+                }
+            } else if (err.message) {
+                errorMessage = err.message;
+            }
+            alert(`Upload Failed:\n${errorMessage}`);
         }
     };
 
@@ -217,6 +237,41 @@ function Memories() {
                 <Typography variant="h4" sx={{ fontWeight: 800 }}>
                     Memories
                 </Typography>
+                <TextField
+                    variant="outlined"
+                    placeholder="Search memories..."
+                    size="small"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon color="action" />
+                            </InputAdornment>
+                        ),
+                    }}
+                    sx={{ bgcolor: 'background.paper', borderRadius: 2, minWidth: { xs: '100%', sm: 300 }, display: { xs: 'none', sm: 'flex' } }}
+                />
+            </Box>
+
+            {/* Mobile Search Bar */}
+            <Box sx={{ mb: 3, display: { xs: 'block', sm: 'none' } }}>
+                <TextField
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Search memories..."
+                    size="small"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon color="action" />
+                            </InputAdornment>
+                        ),
+                    }}
+                    sx={{ bgcolor: 'background.paper', borderRadius: 2 }}
+                />
             </Box>
 
             {!isAuthorized && (
@@ -247,6 +302,8 @@ function Memories() {
                             borderRadius: '3px 3px 0 0',
                         }
                     }}
+                    variant="scrollable"
+                    scrollButtons="auto"
                 >
                     <Tab icon={<ImageIcon />} label="Gallery" iconPosition="start" />
                     <Tab icon={<VideoIcon />} label="Videos" iconPosition="start" />
@@ -278,90 +335,92 @@ function Memories() {
                 </Box>
 
                 <Grid container spacing={3}>
-                    {memories.images.map((memory) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} key={memory.id}>
-                            <Card
-                                key={memory.id}
-                                elevation={0}
-                                sx={{
-                                    position: 'relative',
-                                    borderRadius: 4,
-                                    overflow: 'hidden',
-                                    background: 'transparent',
-                                    transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                    '&:hover': {
-                                        transform: 'translateY(-4px)',
-                                        '& .memory-overlay': {
-                                            opacity: 1
-                                        },
-                                        '& .memory-img': {
-                                            transform: 'scale(1.05)'
+                    {memories.images
+                        .filter(memory => memory.title.toLowerCase().includes(searchTerm.toLowerCase()))
+                        .map((memory) => (
+                            <Grid size={{ xs: 12, sm: 12, md: 6 }} key={memory.id}>
+                                <Card
+                                    key={memory.id}
+                                    elevation={0}
+                                    sx={{
+                                        position: 'relative',
+                                        borderRadius: 4,
+                                        overflow: 'hidden',
+                                        background: 'transparent',
+                                        transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        '&:hover': {
+                                            transform: 'translateY(-4px)',
+                                            '& .memory-overlay': {
+                                                opacity: 1
+                                            },
+                                            '& .memory-img': {
+                                                transform: 'scale(1.05)'
+                                            }
                                         }
-                                    }
-                                }}
-                            >
-                                <Box sx={{ position: 'relative', pt: '75%', overflow: 'hidden', borderRadius: 4 }}>
-                                    <CardMedia
-                                        component="img"
-                                        image={memory.file}
-                                        alt={memory.title}
-                                        className="memory-img"
-                                        sx={{
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'cover',
-                                            transition: 'transform 0.5s ease',
-                                        }}
-                                    />
-                                    <Box
-                                        className="memory-overlay"
-                                        sx={{
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            bottom: 0,
-                                            background: 'linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.7) 100%)',
-                                            opacity: 0.8,
-                                            transition: 'opacity 0.3s ease',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            justifyContent: 'flex-end',
-                                            p: 2
-                                        }}
-                                    >
-                                        <Typography variant="subtitle1" sx={{ color: 'white', fontWeight: 600, textShadow: '0 2px 4px rgba(0,0,0,0.3)' }} noWrap>
-                                            {memory.title}
-                                        </Typography>
-                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-                                            {new Date(memory.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-                                        </Typography>
-                                    </Box>
-
-                                    {isAuthorized && (
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => handleDelete(memory.id, 'image')}
+                                    }}
+                                >
+                                    <Box sx={{ position: 'relative', pt: '75%', overflow: 'hidden', borderRadius: 4 }}>
+                                        <CardMedia
+                                            component="img"
+                                            image={memory.file}
+                                            alt={memory.title}
+                                            className="memory-img"
                                             sx={{
                                                 position: 'absolute',
-                                                top: 8,
-                                                right: 8,
-                                                bgcolor: 'rgba(255,255,255,0.2)',
-                                                color: 'white',
-                                                backdropFilter: 'blur(4px)',
-                                                '&:hover': { bgcolor: 'rgba(244, 67, 54, 0.8)' }
+                                                top: 0,
+                                                left: 0,
+                                                width: '100%',
+                                                height: '100%',
+                                                objectFit: 'cover',
+                                                transition: 'transform 0.5s ease',
+                                            }}
+                                        />
+                                        <Box
+                                            className="memory-overlay"
+                                            sx={{
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 0,
+                                                right: 0,
+                                                bottom: 0,
+                                                background: 'linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.7) 100%)',
+                                                opacity: 0.8,
+                                                transition: 'opacity 0.3s ease',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                justifyContent: 'flex-end',
+                                                p: 2
                                             }}
                                         >
-                                            <DeleteIcon fontSize="small" />
-                                        </IconButton>
-                                    )}
-                                </Box>
-                            </Card>
-                        </Grid>
-                    ))}
+                                            <Typography variant="subtitle1" sx={{ color: 'white', fontWeight: 600, textShadow: '0 2px 4px rgba(0,0,0,0.3)' }} noWrap>
+                                                {memory.title}
+                                            </Typography>
+                                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                                                {new Date(memory.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                                            </Typography>
+                                        </Box>
+
+                                        {isAuthorized && (
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => handleDelete(memory.id, 'image')}
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: 8,
+                                                    right: 8,
+                                                    bgcolor: 'rgba(255,255,255,0.2)',
+                                                    color: 'white',
+                                                    backdropFilter: 'blur(4px)',
+                                                    '&:hover': { bgcolor: 'rgba(244, 67, 54, 0.8)' }
+                                                }}
+                                            >
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                        )}
+                                    </Box>
+                                </Card>
+                            </Grid>
+                        ))}
                     {memories.images.length === 0 && (
                         <Box sx={{ width: '100%', textAlign: 'center', py: 8 }}>
                             <Typography variant="body1" color="text.secondary">
@@ -397,57 +456,59 @@ function Memories() {
                 </Box>
 
                 <Grid container spacing={3}>
-                    {memories.videos.map((memory) => (
-                        <Grid item xs={12} sm={6} md={4} key={memory.id}>
-                            <Card
-                                key={memory.id}
-                                elevation={0}
-                                sx={{
-                                    position: 'relative',
-                                    borderRadius: 4,
-                                    overflow: 'hidden',
-                                    background: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : '#fff',
-                                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                                    border: '1px solid',
-                                    borderColor: theme.palette.divider
-                                }}
-                            >
-                                {isAuthorized && (
-                                    <IconButton
-                                        size="small"
-                                        onClick={() => handleDelete(memory.id, 'video')}
-                                        sx={{
-                                            position: 'absolute',
-                                            top: 8,
-                                            right: 8,
-                                            zIndex: 2,
-                                            bgcolor: 'rgba(0,0,0,0.5)',
-                                            color: 'white',
-                                            '&:hover': { bgcolor: 'rgba(244, 67, 54, 0.8)' }
-                                        }}
-                                    >
-                                        <DeleteIcon fontSize="small" />
-                                    </IconButton>
-                                )}
-                                <CardMedia
-                                    component="video"
-                                    height="220"
-                                    src={memory.file}
-                                    controls
-                                    sx={{ objectFit: 'cover', bgcolor: '#000' }}
-                                />
-                                <CardContent sx={{ p: 2 }}>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }} noWrap>
-                                        {memory.title}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                        <VideoIcon sx={{ fontSize: 14 }} />
-                                        {new Date(memory.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
+                    {memories.videos
+                        .filter(memory => memory.title.toLowerCase().includes(searchTerm.toLowerCase()))
+                        .map((memory) => (
+                            <Grid size={{ xs: 12, sm: 6, md: 6, lg: 4 }} key={memory.id}>
+                                <Card
+                                    key={memory.id}
+                                    elevation={0}
+                                    sx={{
+                                        position: 'relative',
+                                        borderRadius: 4,
+                                        overflow: 'hidden',
+                                        background: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : '#fff',
+                                        boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                                        border: '1px solid',
+                                        borderColor: theme.palette.divider
+                                    }}
+                                >
+                                    {isAuthorized && (
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => handleDelete(memory.id, 'video')}
+                                            sx={{
+                                                position: 'absolute',
+                                                top: 8,
+                                                right: 8,
+                                                zIndex: 2,
+                                                bgcolor: 'rgba(0,0,0,0.5)',
+                                                color: 'white',
+                                                '&:hover': { bgcolor: 'rgba(244, 67, 54, 0.8)' }
+                                            }}
+                                        >
+                                            <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                    )}
+                                    <CardMedia
+                                        component="video"
+                                        height="220"
+                                        src={memory.file}
+                                        controls
+                                        sx={{ objectFit: 'cover', bgcolor: '#000' }}
+                                    />
+                                    <CardContent sx={{ p: 2 }}>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }} noWrap>
+                                            {memory.title}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <VideoIcon sx={{ fontSize: 14 }} />
+                                            {new Date(memory.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))}
                     {memories.videos.length === 0 && (
                         <Box sx={{ width: '100%', textAlign: 'center', py: 8 }}>
                             <Typography variant="body1" color="text.secondary">

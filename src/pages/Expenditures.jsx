@@ -22,6 +22,7 @@ import {
     TableContainer,
     TableHead,
     TableRow,
+    InputAdornment
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -29,6 +30,7 @@ import {
     Save as SaveIcon,
     Cancel as CancelIcon,
     Receipt as ReceiptIcon,
+    Search as SearchIcon
 } from '@mui/icons-material';
 import { useAuth } from '../services/authComponents';
 import expenditureAPI from '../services/expenditureService';
@@ -38,6 +40,7 @@ function Expenditures() {
     const [expenditures, setExpenditures] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+    const [searchTerm, setSearchTerm] = useState('');
     const [formData, setFormData] = useState({
         year: new Date().getFullYear().toString(),
         purpose: '',
@@ -150,27 +153,64 @@ function Expenditures() {
                 <Typography variant="h4" sx={{ fontWeight: 800 }}>
                     Expenditures
                 </Typography>
-                {isAuthorized && (
-                    <Button
-                        variant="contained"
-                        startIcon={<AddIcon />}
-                        onClick={handleOpenDialog}
-                        sx={{
-                            borderRadius: 2,
-                            px: 3,
-                            py: 1,
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            boxShadow: '0 4px 14px 0 rgba(118, 75, 162, 0.3)',
-                            '&:hover': {
-                                background: 'linear-gradient(135deg, #5568d3 0%, #63408a 100%)',
-                                transform: 'translateY(-1px)',
-                                boxShadow: '0 6px 20px 0 rgba(118, 75, 162, 0.4)',
-                            },
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                    <TextField
+                        variant="outlined"
+                        placeholder="Search purpose..."
+                        size="small"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon color="action" />
+                                </InputAdornment>
+                            ),
                         }}
-                    >
-                        Add Expenditure
-                    </Button>
-                )}
+                        sx={{ bgcolor: 'background.paper', borderRadius: 2, minWidth: { xs: '100%', sm: 250 }, display: { xs: 'none', sm: 'flex' } }}
+                    />
+                    {isAuthorized && (
+                        <Button
+                            variant="contained"
+                            startIcon={<AddIcon />}
+                            onClick={handleOpenDialog}
+                            sx={{
+                                borderRadius: 2,
+                                px: 3,
+                                py: 1,
+                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                boxShadow: '0 4px 14px 0 rgba(118, 75, 162, 0.3)',
+                                '&:hover': {
+                                    background: 'linear-gradient(135deg, #5568d3 0%, #63408a 100%)',
+                                    transform: 'translateY(-1px)',
+                                    boxShadow: '0 6px 20px 0 rgba(118, 75, 162, 0.4)',
+                                },
+                            }}
+                        >
+                            Add Expenditure
+                        </Button>
+                    )}
+                </Box>
+            </Box>
+
+            {/* Mobile Search Bar */}
+            <Box sx={{ mb: 3, display: { xs: 'block', sm: 'none' } }}>
+                <TextField
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Search purpose..."
+                    size="small"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon color="action" />
+                            </InputAdornment>
+                        ),
+                    }}
+                    sx={{ bgcolor: 'background.paper', borderRadius: 2 }}
+                />
             </Box>
 
             {!isAuthorized && (
@@ -219,53 +259,52 @@ function Expenditures() {
             )}
 
             {/* Total Amount Card using Grid */}
-            <Box sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                gap: 3,
-                mb: 4
-            }}>
-                <Card
-                    elevation={0}
-                    sx={{
-                        borderRadius: 4,
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        color: 'white',
-                        boxShadow: '0 8px 32px rgba(118, 75, 162, 0.25)',
-                        position: 'relative',
-                        overflow: 'hidden'
-                    }}
-                >
-                    <Box sx={{
-                        position: 'absolute',
-                        top: -20,
-                        right: -20,
-                        width: 150,
-                        height: 150,
-                        borderRadius: '50%',
-                        background: 'rgba(255,255,255,0.1)'
-                    }} />
-                    <CardContent sx={{ p: 4 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                            <Box sx={{
-                                p: 1,
-                                borderRadius: 2,
-                                bgcolor: 'rgba(255,255,255,0.2)',
-                                mr: 2,
-                                display: 'flex'
-                            }}>
-                                <ReceiptIcon sx={{ fontSize: 24, color: '#fff' }} />
+            {/* Total Amount Card using Grid */}
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+                <Grid item xs={12} sm={6} md={4}>
+                    <Card
+                        elevation={0}
+                        sx={{
+                            borderRadius: 4,
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            color: 'white',
+                            boxShadow: '0 8px 32px rgba(118, 75, 162, 0.25)',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            height: '100%'
+                        }}
+                    >
+                        <Box sx={{
+                            position: 'absolute',
+                            top: -20,
+                            right: -20,
+                            width: 150,
+                            height: 150,
+                            borderRadius: '50%',
+                            background: 'rgba(255,255,255,0.1)'
+                        }} />
+                        <CardContent sx={{ p: 4 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                <Box sx={{
+                                    p: 1,
+                                    borderRadius: 2,
+                                    bgcolor: 'rgba(255,255,255,0.2)',
+                                    mr: 2,
+                                    display: 'flex'
+                                }}>
+                                    <ReceiptIcon sx={{ fontSize: 24, color: '#fff' }} />
+                                </Box>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600, opacity: 0.9 }}>
+                                    Total Spent in {currentYear}
+                                </Typography>
                             </Box>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 600, opacity: 0.9 }}>
-                                Total Spent in {currentYear}
+                            <Typography variant="h3" sx={{ fontWeight: 800, mt: 2 }}>
+                                ₹{calculateYearTotal(currentYear).toLocaleString()}
                             </Typography>
-                        </Box>
-                        <Typography variant="h3" sx={{ fontWeight: 800, mt: 2 }}>
-                            ₹{calculateYearTotal(currentYear).toLocaleString()}
-                        </Typography>
-                    </CardContent>
-                </Card>
-            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
 
             {/* Expenditures Table */}
             {currentYearExpenditures.length > 0 ? (
@@ -291,52 +330,54 @@ function Expenditures() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {currentYearExpenditures.map((expenditure, index) => (
-                                <TableRow
-                                    key={expenditure.id}
-                                    sx={{
-                                        transition: 'background-color 0.2s',
-                                        '&:hover': {
-                                            bgcolor: theme.palette.mode === 'dark'
-                                                ? 'rgba(255,255,255,0.03)'
-                                                : 'rgba(102, 126, 234, 0.04)',
-                                        },
-                                    }}
-                                >
-                                    <TableCell sx={{ py: 2 }}>{index + 1}</TableCell>
-                                    <TableCell sx={{ py: 2, fontWeight: 500 }}>{expenditure.purpose}</TableCell>
-                                    <TableCell sx={{ py: 2 }}>
-                                        <Box sx={{
-                                            display: 'inline-block',
-                                            px: 1.5,
-                                            py: 0.5,
-                                            bgcolor: 'rgba(244, 67, 54, 0.1)',
-                                            color: '#d32f2f',
-                                            borderRadius: 1,
-                                            fontWeight: 600
-                                        }}>
-                                            ₹{expenditure.amountSpent.toLocaleString()}
-                                        </Box>
-                                    </TableCell>
-                                    <TableCell sx={{ py: 2, color: 'text.secondary' }}>
-                                        {new Date(expenditure.createdAt).toLocaleDateString()}
-                                    </TableCell>
-                                    {isAuthorized && (
+                            {currentYearExpenditures
+                                .filter(exp => exp.purpose.toLowerCase().includes(searchTerm.toLowerCase()))
+                                .map((expenditure, index) => (
+                                    <TableRow
+                                        key={expenditure.id}
+                                        sx={{
+                                            transition: 'background-color 0.2s',
+                                            '&:hover': {
+                                                bgcolor: theme.palette.mode === 'dark'
+                                                    ? 'rgba(255,255,255,0.03)'
+                                                    : 'rgba(102, 126, 234, 0.04)',
+                                            },
+                                        }}
+                                    >
+                                        <TableCell sx={{ py: 2 }}>{index + 1}</TableCell>
+                                        <TableCell sx={{ py: 2, fontWeight: 500 }}>{expenditure.purpose}</TableCell>
                                         <TableCell sx={{ py: 2 }}>
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => handleDelete(expenditure.id)}
-                                                sx={{
-                                                    color: theme.palette.error.main,
-                                                    '&:hover': { bgcolor: 'rgba(244, 67, 54, 0.1)' }
-                                                }}
-                                            >
-                                                <DeleteIcon fontSize="small" />
-                                            </IconButton>
+                                            <Box sx={{
+                                                display: 'inline-block',
+                                                px: 1.5,
+                                                py: 0.5,
+                                                bgcolor: 'rgba(244, 67, 54, 0.1)',
+                                                color: '#d32f2f',
+                                                borderRadius: 1,
+                                                fontWeight: 600
+                                            }}>
+                                                ₹{expenditure.amountSpent.toLocaleString()}
+                                            </Box>
                                         </TableCell>
-                                    )}
-                                </TableRow>
-                            ))}
+                                        <TableCell sx={{ py: 2, color: 'text.secondary' }}>
+                                            {new Date(expenditure.createdAt).toLocaleDateString()}
+                                        </TableCell>
+                                        {isAuthorized && (
+                                            <TableCell sx={{ py: 2 }}>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => handleDelete(expenditure.id)}
+                                                    sx={{
+                                                        color: theme.palette.error.main,
+                                                        '&:hover': { bgcolor: 'rgba(244, 67, 54, 0.1)' }
+                                                    }}
+                                                >
+                                                    <DeleteIcon fontSize="small" />
+                                                </IconButton>
+                                            </TableCell>
+                                        )}
+                                    </TableRow>
+                                ))}
                             <TableRow sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(102, 126, 234, 0.15)' : 'rgba(102, 126, 234, 0.08)' }}>
                                 <TableCell colSpan={2} sx={{ fontWeight: 700, fontSize: '1.1rem', py: 3 }}>
                                     Total
